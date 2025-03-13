@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     EMAIL_HOST_USER: str
     EMAIL_HOST_PASSWORD: str
 
+    ALLOWED_HOSTS: str = ""
+
     class Config:
         env_file = BASE_DIR / ".env"
 
@@ -39,7 +41,17 @@ SECRET_KEY = 'django-insecure-tqnlchab6t0zt0+_lxi1#8)j1ozdw90=2)gvnwi1iwbi_&2gi1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = settings.ALLOWED_HOSTS.split(',') if settings.ALLOWED_HOSTS != "" else ['*']
+
+CORS_ALLOW_ALL_METHODS = True
+CORS_ALLOW_HEADERS = ['*']
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://aqylshyn.kz',
+    'https://*.aqylshyn.kz',
+]
 
 # Application definition
 DJANGO_APPS = [
@@ -57,7 +69,8 @@ LOCAL_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'drf_spectacular'
+    'drf_spectacular',
+    'corsheaders',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -174,7 +187,6 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = settings.EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
 EMAIL_PORT = 587
-
 
 REDIS_HOST = settings.REDIS_HOST
 REDIS_PORT = settings.REDIS_PORT
