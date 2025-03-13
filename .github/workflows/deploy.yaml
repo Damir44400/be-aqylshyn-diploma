@@ -23,7 +23,8 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
-          cd ~/projects/be-aqylshyn-diploma
-          git pull origin main
-          docker compose up -d --build
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd /home/ubuntu/projects/be-aqylshyn-diploma || exit 1
+            git pull origin main
+            docker compose up -d --build
+          EOF
