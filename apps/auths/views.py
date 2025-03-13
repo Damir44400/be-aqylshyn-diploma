@@ -1,14 +1,21 @@
-from rest_framework import generics, status
+from drf_spectacular.utils import extend_schema_view, extend_schema
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
 
 from apps.auths import serializers as auth_serializers
 from apps.auths import services as auth_services
 from apps.common import mixins as common_mixins
 
-
-class AuthView(common_mixins.ActionSerializerMixin, GenericViewSet):
+@extend_schema_view(
+    send_otp=extend_schema(
+        summary="Send otp when user forgot password",
+    ),
+    verify_otp=extend_schema(
+        summary="Verify otp when user send otp",
+    ),
+)
+class AuthView(common_mixins.ActionSerializerMixin, viewsets.GenericViewSet):
     serializers = {
         "register": auth_serializers.UserCreateSerializer,
         "send_otp": auth_serializers.SendOTPSerializer,

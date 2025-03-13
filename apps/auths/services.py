@@ -13,11 +13,11 @@ class AuthService:
         email = data['email']
         redis_service = RedisService()
 
-        chars = string.ascii_letters + string.digits + string.punctuation
-        generated_otp = ''.join(random.choice(chars) for _ in range(6))
+        digits = string.digits
+        generated_otp = ''.join(random.choice(digits) for _ in range(6))
 
         while redis_service.get(generated_otp):
-            generated_otp = ''.join(random.choice(chars) for _ in range(6))
+            generated_otp = ''.join(random.choice(digits) for _ in range(6))
 
         redis_service.set(generated_otp, email)
 
