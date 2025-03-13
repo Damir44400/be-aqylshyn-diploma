@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  be-aqylshyn:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8000:8000"
+    container_name: backend-aqylshyn
+    restart: always
+    depends_on:
+      - db-aqylshyn
+      - redis-aqylshyn
+    env_file:
+      - .env
+    networks:
+      - network-aqylshyn
+
+  db-aqylshyn:
+    image: postgres:latest
+    container_name: database-aqylshyn
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - network-aqylshyn
+    env_file:
+      - .env
+
+  redis-aqylshyn:
+    image: redis:latest
+    restart: always
+    networks:
+      - network-aqylshyn
+
+volumes:
+  pg_data: {}
+
+networks:
+  network-aqylshyn: {}
