@@ -43,14 +43,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = settings.ALLOWED_HOSTS.split(',') if settings.ALLOWED_HOSTS != "" else ['*']
 
-CORS_ALLOW_ALL_METHODS = True
-CORS_ALLOW_HEADERS = ['*']
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_ALLOW_ALL = True
 
 CSRF_TRUSTED_ORIGINS = [
     'https://aqylshyn.kz',
     'https://*.aqylshyn.kz',
+    "http://localhost:3000"
 ]
 
 # Application definition
