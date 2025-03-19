@@ -11,6 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
             "profile_picture",
             "first_name",
             "email",
+            "is_staff",
         )
 
 
@@ -24,7 +25,6 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "first_name",
-            "email",
             "last_password",
             "password",
             "password2",

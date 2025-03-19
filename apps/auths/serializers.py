@@ -33,3 +33,15 @@ class SendOTPSerializer(serializers.Serializer):
 class VerifyOTPSerializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.CharField()
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True, required=True)
+    password2 = serializers.CharField(write_only=True, required=True)
+
+    def validate(self, attrs):
+        password = attrs.get("password")
+        password2 = attrs.pop("password2")
+        if password != password2:
+            raise serializers.ValidationError({"detail": "Passwords must match."})
+        return attrs

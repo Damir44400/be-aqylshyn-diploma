@@ -19,7 +19,10 @@ dependencies = [
     "psycopg2 (>=2.9.10,<3.0.0)",
     "redis (>=5.2.1,<6.0.0)",
     "django-filter (>=25.1,<26.0)",
-    "django-cors-headers (>=4.7.0,<5.0.0)"
+    "django-cors-headers (>=4.7.0,<5.0.0)",
+    "django-jazzmin (>=3.0.1,<4.0.0)",
+    "certifi (>=2025.1.31,<2026.0.0)",
+    "django-nested-admin (>=4.1.1,<5.0.0)"
 ]
 
 

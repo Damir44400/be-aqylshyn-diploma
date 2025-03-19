@@ -1,15 +1,20 @@
 import random
 import string
+import uuid
+
+from rest_framework.exceptions import ValidationError
 
 from apps.common.services import EmailService, RedisService
 from apps.users import models as user_models
 
 
 class AuthService:
-    def register(self, data):
+    @staticmethod
+    def register(data):
         return user_models.User.objects.create_user(**data)
 
-    def send_otp(self, data):
+    @staticmethod
+    def send_otp(data):
         email = data['email']
         redis_service = RedisService()
 
@@ -26,14 +31,15 @@ class AuthService:
             f"You have requested a password reset. Your OTP code is: {generated_otp}\n\n"
             f"If you did not request this code, you can safely ignore this email."
         )
-
+        print(generated_otp)
         EmailService().smtp(
             subject="Password Reset Code",
             body=message,
             to=[email],
         )
 
-    def verify_otp(self, data):
+    @staticmethod
+    def verify_otp(data):
         email = data['email']
         otp = data['otp']
 
@@ -41,10 +47,30 @@ class AuthService:
         stored_email = redis_service.get(otp)
 
         if not stored_email:
-            return False
+            raise ValidationError({"detail": "OTP code is invalid"})
 
         if stored_email != email:
-            return False
+            raise ValidationError({"detail": "OTP code is invalid"})
 
         redis_service.delete(otp)
-        return True
+        generate_session_token = uuid.uuid4().hex
+        redis_service.set(f"session_token:{generate_session_token}", email, expire=360)
+
+        return generate_session_token
+
+    @staticmethod
+    def reset_password(data, session_token):
+        redis_service = RedisService()
+
+        email = redis_service.get(f"session_token:{session_token}")
+        if not email:
+            raise ValidationError({"detail": "Session token is expired or invalid"})
+
+        user = user_models.User.objects.filter(email=email).first()
+
+        if not user:
+            raise ValidationError({"detail": "User not found, please try again or contact with support."})
+
+        user.password = data['password']
+        user.save()
+        return user

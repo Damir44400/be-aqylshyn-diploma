@@ -17,5 +17,5 @@ class User(AbstractUser, common_models.BaseModel):
     objects = user_managers.UserManager()
 
     class Meta:
-        verbose_name = _("User")
-        verbose_name_plural = _("Users")
+        verbose_name = _("Қолданушы")
+        verbose_name_plural = _("Қолданушылар тізімі")

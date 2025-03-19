@@ -1,16 +1,42 @@
-from rest_framework import generics
+from rest_framework import viewsets, mixins
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
-from src.common import mixins as common_mixins
-from src.users import models as user_models
+from apps.common import mixins as common_mixins
+from apps.common import serializers as common_serializers
+from apps.users import models as user_models
+from apps.users import serializers as user_serializers
+from apps.users import services as user_services
 
 
 # Create your views here.
 class UserViewSet(
     common_mixins.ActionSerializerMixin,
     common_mixins.ActionPermissionMixin,
-    generics.GenericAPIView
+    viewsets.GenericViewSet,
 ):
     queryset = user_models.User.objects.all()
     serializers = {
-        ""
+        "me": user_serializers.UserSerializer,
+        "me_update": user_serializers.UserUpdateSerializer,
     }
+
+    serializer_class = user_serializers.UserSerializer
+    service = user_services.UserService()
+
+    @action(detail=False, methods=["get"], url_path="me")
+    def me(self, request):
+        user = self.request.user
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["patch"], url_path="profile")
+    def me_update(self, request):
+        user = self.request.user
+        serializer = self.get_serializer(user, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            self.service.update(user, serializer.validated_data)
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=400)
