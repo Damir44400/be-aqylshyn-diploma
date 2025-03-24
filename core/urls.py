@@ -6,6 +6,8 @@ from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
+    path('courses/', include('apps.courses.urls')),
+    path('general-english/', include('apps.general_english.urls')),
     path('auth/', include('apps.auths.urls')),
     path('users/', include('apps.users.urls')),
     path('i18n/', include('django.conf.urls.i18n')),

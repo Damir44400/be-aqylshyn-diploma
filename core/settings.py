@@ -1,10 +1,12 @@
 import os
 from pathlib import Path
+from datetime import timedelta
 
-from django.utils.translation.trans_null import gettext_lazy as _
+import firebase_admin
+from firebase_admin import credentials
 from pydantic_settings import BaseSettings
+from django.utils.translation.trans_null import gettext_lazy as _
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -23,9 +25,18 @@ class Settings(BaseSettings):
     EMAIL_HOST_PASSWORD: str
 
     ALLOWED_HOSTS: str = ""
+    OPENAI_API_KEY: str = ""
+    ELEVENLAB_API_KEY: str = ""
+    ELEVENLAB_VOICE: str
+    ELEVENLAB_MODEL: str
+    FIREBASE_CREDENTIALS_FILE: str = ""
 
     class Config:
         env_file = BASE_DIR / ".env"
+
+    @property
+    def get_redis_url(self):
+        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{settings.REDIS_DB}"
 
 
 def get_settings() -> Settings:
@@ -38,6 +49,13 @@ settings = get_settings()
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+if not firebase_admin._apps:
+    try:
+        cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS_FILE)
+        firebase_admin.initialize_app(cred)
+    except:
+        pass
+
 SECRET_KEY = 'django-insecure-tqnlchab6t0zt0+_lxi1#8)j1ozdw90=2)gvnwi1iwbi_&2gi1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -68,12 +86,15 @@ DJANGO_APPS = [
 LOCAL_APPS = [
     'apps.users.apps.UsersConfig',
     'apps.auths.apps.AuthsConfig',
+    'apps.general_english.apps.GeneralEnglishConfig',
+    'apps.courses.apps.CoursesConfig',
 ]
 
 THIRD_PARTY_APPS = [
     'drf_spectacular',
     'corsheaders',
     'nested_admin',
+    "fcm_django"
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -135,6 +156,11 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FileUploadParser',
     ],
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 DATABASES = {
@@ -145,6 +171,13 @@ DATABASES = {
         'PASSWORD': settings.POSTGRES_PASSWORD,
         'HOST': settings.POSTGRES_HOST,
         'PORT': settings.POSTGRES_PORT,
+    }
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': settings.get_redis_url,
     }
 }
 
@@ -206,3 +239,9 @@ EMAIL_USE_SSL = False
 REDIS_HOST = settings.REDIS_HOST
 REDIS_PORT = settings.REDIS_PORT
 REDIS_DB = settings.REDIS_DB
+
+CELERY_BROKER_URL = settings.get_redis_url
+CELERY_TIMEZONE = 'Asia/Almaty'
+CELERY_CACHE_BACKEND = 'default'
+
+OPENAI_API_KEY = settings.OPENAI_API_KEY

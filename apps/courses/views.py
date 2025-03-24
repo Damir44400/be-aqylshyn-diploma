@@ -1,0 +1,32 @@
+from drf_spectacular.utils import extend_schema
+from rest_framework import viewsets, mixins
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+from apps.common import mixins as common_mixins, enums
+from apps.courses import models as courses_models
+from apps.courses import serializers as course_serializers
+from apps.courses.entity_serializers import general_english as course_general_english_serializers
+
+
+class CourseViewSet(
+    common_mixins.ActionSerializerMixin,
+    mixins.RetrieveModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    serializers = {
+        "list": course_serializers.CourseSerializer,
+        "retrieve": course_general_english_serializers.CourseGeneralEnglishRetrieveSerializer,
+        "general_english_modules": course_general_english_serializers.CourseGeneralEnglishModuleSerializer
+    }
+    permission_classes = [IsAuthenticated]
+    queryset = courses_models.Course.objects.all()
+
+    @extend_schema(tags=["general-english"])
+    @action(detail=False, methods=["get"], url_path="general-english-modules")
+    def general_english_modules(self, request, pk=None):
+        instance = self.get_queryset().filter(type=enums.CourseType.GENERAL_ENGLISH)
+        serializer = self.get_serializer(instance, context={"request": request}, many=True)
+        return Response(serializer.data)

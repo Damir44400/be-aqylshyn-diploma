@@ -1,0 +1,15 @@
+from rest_framework import serializers
+
+from apps.general_english import models
+from .reading_option import ReadingOptionSerializer
+
+class ReadingQuestionSerializer(serializers.ModelSerializer):
+    options = ReadingOptionSerializer(many=True, source='reading_options')
+
+    class Meta:
+        model = models.ReadingQuestion
+        fields = (
+            'id',
+            'question',
+            'options'
+        )

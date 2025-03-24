@@ -38,6 +38,23 @@ services:
     networks:
       - network-aqylshyn
 
+  celery-beat:
+    image: .
+    restart: always
+    command:
+      - celery -A core beat --loglevel=info
+    depends_on:
+      - redis-aqylshyn
+
+  celery-worker:
+    image: .
+    restart: always
+    command:
+      - celery -A core worker --loglevel=info
+    depends_on:
+      - redis-aqylshyn
+
+
 volumes:
   pg_data: {}
 
