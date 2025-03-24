@@ -39,7 +39,7 @@ services:
       - network-aqylshyn
 
   celery-beat:
-    image: .
+    build: .
     restart: always
     command:
       - celery -A core beat --loglevel=info
@@ -47,7 +47,7 @@ services:
       - redis-aqylshyn
 
   celery-worker:
-    image: .
+    build: .
     restart: always
     command:
       - celery -A core worker --loglevel=info
