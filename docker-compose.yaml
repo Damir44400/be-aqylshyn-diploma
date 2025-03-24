@@ -42,8 +42,7 @@ services:
   celery-beat:
     image: aqylshyn
     restart: always
-    command:
-      - celery -A core beat --loglevel=info
+    command: ["celery", "-A", "core", "beat", "--loglevel=info"]
     depends_on:
       - redis-aqylshyn
       - be-aqylshyn
@@ -51,8 +50,7 @@ services:
   celery-worker:
     image: aqylshyn
     restart: always
-    command:
-      - celery -A core worker --loglevel=info
+    command: [ "celery", "-A", "core", "worker", "--loglevel=info" ]
     depends_on:
       - redis-aqylshyn
       - be-aqylshyn
