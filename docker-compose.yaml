@@ -8,7 +8,6 @@ services:
     ports:
       - "8000:8000"
     container_name: backend-aqylshyn
-    image: aqylshyn
     restart: always
     depends_on:
       - db-aqylshyn
@@ -40,7 +39,7 @@ services:
       - network-aqylshyn
 
   celery-beat:
-    image: aqylshyn
+    image: backend-aqylshyn
     restart: always
     command: ["celery", "-A", "core", "beat", "--loglevel=info"]
     depends_on:
@@ -48,7 +47,7 @@ services:
       - be-aqylshyn
 
   celery-worker:
-    image: aqylshyn
+    image: backend-aqylshyn
     restart: always
     command: [ "celery", "-A", "core", "worker", "--loglevel=info" ]
     depends_on:
