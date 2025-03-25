@@ -7,15 +7,21 @@ class OptionSubmitSerializer(serializers.Serializer):
 
 
 class ModuleOptionSubmitSerializer(serializers.Serializer):
-    section_name = serializers.ChoiceField(choices=[("reading", "reading"), ("listening", "listening")])
     options = OptionSubmitSerializer(many=True)
 
 
-class TextSubmitSerializer(serializers.Serializer):
-    question_id = serializers.IntegerField()
+class WritingSubmitSerializer(serializers.Serializer):
     text = serializers.CharField()
 
 
-class ModuleAnswerSubmitSerializer(serializers.Serializer):
-    section_name = serializers.ChoiceField(choices=[("speaking", "speaking"), ("writing", "writing")])
-    answers = TextSubmitSerializer(many=True)
+class ModuleWritingSubmitSerializer(serializers.Serializer):
+    writing = WritingSubmitSerializer(many=False)
+
+
+class SpeakingSubmitSerializer(serializers.Serializer):
+    speaking_id = serializers.IntegerField()
+    text = serializers.CharField()
+
+
+class ModuleSpeakingSubmitSerializer(serializers.Serializer):
+    speaking = SpeakingSubmitSerializer(many=True)

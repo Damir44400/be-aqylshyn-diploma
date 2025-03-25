@@ -4,7 +4,7 @@ from apps.general_english import models
 from .reading_option import ReadingOptionSerializer
 
 class ReadingQuestionSerializer(serializers.ModelSerializer):
-    options = ReadingOptionSerializer(many=True, source='reading_options')
+    options = ReadingOptionSerializer(many=True)
 
     class Meta:
         model = models.ReadingQuestion

@@ -7,7 +7,6 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "8000:8000"
-    container_name: backend-aqylshyn
     restart: always
     depends_on:
       - db-aqylshyn
@@ -39,7 +38,7 @@ services:
       - network-aqylshyn
 
   celery-beat:
-    image: backend-aqylshyn
+    build: .
     restart: always
     command: ["celery", "-A", "core", "beat", "--loglevel=info"]
     depends_on:
@@ -47,7 +46,7 @@ services:
       - be-aqylshyn
 
   celery-worker:
-    image: backend-aqylshyn
+    build: .
     restart: always
     command: [ "celery", "-A", "core", "worker", "--loglevel=info" ]
     depends_on:

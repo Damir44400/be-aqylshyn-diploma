@@ -8,7 +8,7 @@ class ReadingOption(models.Model):
     question = models.ForeignKey(
         ReadingQuestion,
         on_delete=models.CASCADE,
-        related_name='reading_options',
+        related_name='options',
         verbose_name=_("Сұрақ")
     )
     option = models.TextField(

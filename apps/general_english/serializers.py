@@ -13,5 +13,6 @@ from .entity_serializers.listenings.listening_question import ListeningQuestionS
 from .entity_serializers.module import ModuleWritingSerializer
 from .entity_serializers.module import ModuleListeningSerializer
 from .entity_serializers.module import ModuleSpeakingSerializer
-from .entity_serializers.module_submit import ModuleAnswerSubmitSerializer
+from .entity_serializers.module_submit import ModuleSpeakingSubmitSerializer
 from .entity_serializers.module_submit import ModuleOptionSubmitSerializer
+from .entity_serializers.module_submit import ModuleWritingSubmitSerializer

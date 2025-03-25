@@ -1,4 +1,3 @@
-import json
 import logging
 
 from celery import shared_task
@@ -11,20 +10,10 @@ from apps.llms.prompts.module_generate_prompt import get_module_generate_prompt
 from apps.llms.prompts.reading_generate_prompt import get_reading_prompt
 from apps.llms.prompts.speaking_generate_prompt import get_speaking_prompt
 from apps.llms.prompts.writing_generate_prompt import get_writing_prompt
+from apps.llms.tasks import parse_json_response
 
 logger = logging.getLogger(__name__)
 MAX_ATTEMPT = 3
-
-
-def _parse_json_response(response_text: str) -> dict:
-    try:
-        data = json.loads(response_text)
-        if not isinstance(data, dict):
-            raise ValueError("Parsed JSON is not an object.")
-        return data
-    except json.JSONDecodeError as e:
-        logger.error(f"Failed to parse LLM response as JSON: {response_text[:200]}...")
-        raise ValueError(f"Invalid JSON response from OpenAI: {str(e)}")
 
 
 def _create_reading_for_module(created_module, user_level):
@@ -50,7 +39,7 @@ def _create_reading_for_module(created_module, user_level):
         else:
             response_text = response
         try:
-            response_data = _parse_json_response(response_text)
+            response_data = parse_json_response(response_text)
         except ValueError as e:
             logger.error(f"Attempt {attempt + 1} failed: {e}")
             attempt += 1
@@ -108,7 +97,7 @@ def _create_writing_for_module(created_module, user_level):
         response_text = response.text if hasattr(response, 'text') else response
 
         try:
-            response_data = _parse_json_response(response_text)
+            response_data = parse_json_response(response_text)
         except ValueError as e:
             logger.error(f"Attempt {attempt + 1} failed: {e}")
             attempt += 1
@@ -151,7 +140,7 @@ def _create_listening_for_module(created_module, user_level):
         response_text = response.text if hasattr(response, 'text') else response
 
         try:
-            response_data = _parse_json_response(response_text)
+            response_data = parse_json_response(response_text)
         except ValueError as e:
             logger.error(f"Attempt {attempt + 1} failed: {e}")
             attempt += 1
@@ -191,7 +180,7 @@ def _create_speaking_for_module(created_module, user_level):
         "user_level": user_level,
     }
     attempt = 0
-    reading_data = None
+    speaking_data = None
     while attempt < MAX_ATTEMPT:
         response = openai_cli.OpenAICLI().send_request(
             reading_prompt,
@@ -206,20 +195,20 @@ def _create_speaking_for_module(created_module, user_level):
         else:
             response_text = response
         try:
-            response_data = _parse_json_response(response_text)
+            response_data = parse_json_response(response_text)
         except ValueError as e:
             logger.error(f"Attempt {attempt + 1} failed: {e}")
             attempt += 1
             continue
 
-        reading_data = response_data.get('reading', {})
-        if reading_data:
+        speaking_data = response_data.get('speaking', {})
+        if speaking_data:
             break
         elif attempt == MAX_ATTEMPT - 1:
             logger.error(f"Failed to create reading for module {created_module.name}.")
             return
         attempt += 1
-    sentences = reading_data.get('sentences', [])
+    sentences = speaking_data.get('sentences', [])
     for sentence in sentences:
         general_english_models.Speaking.objects.create(
             context=sentence.get('text', ''),
@@ -264,7 +253,7 @@ def generate_modules(self, user_course_id, score, user_answers_log):
             response_text = response.text if hasattr(response, 'text') else response
 
             try:
-                response_data = _parse_json_response(response_text)
+                response_data = parse_json_response(response_text)
             except ValueError as e:
                 logger.error(f"Attempt {attempt + 1} failed: {e}")
                 attempt += 1
