@@ -1,11 +1,11 @@
 import os
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
 
 import firebase_admin
+from django.utils.translation.trans_null import gettext_lazy as _
 from firebase_admin import credentials
 from pydantic_settings import BaseSettings
-from django.utils.translation.trans_null import gettext_lazy as _
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -94,7 +94,8 @@ THIRD_PARTY_APPS = [
     'drf_spectacular',
     'corsheaders',
     'nested_admin',
-    "fcm_django"
+    "fcm_django",
+    'rest_framework',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -155,6 +156,9 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
         'rest_framework.parsers.FileUploadParser',
     ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ]
 }
 
 SIMPLE_JWT = {
