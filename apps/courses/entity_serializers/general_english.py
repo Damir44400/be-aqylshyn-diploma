@@ -8,13 +8,15 @@ from apps.general_english import serializers as general_english_serializers
 class CourseGeneralEnglishRetrieveSerializer(course_serializers.CourseSerializer):
     last_module = serializers.SerializerMethodField()
     user_progress = serializers.SerializerMethodField()
+    last_module_name = serializers.SerializerMethodField()
 
     class Meta(course_serializers.CourseSerializer.Meta):
         fields = course_serializers.CourseSerializer.Meta.fields + (
             "description",
             "duration",
             "last_module",
-            "user_progress"
+            "user_progress",
+            "last_module_name",
         )
 
     def get_last_module(self, obj):
@@ -22,7 +24,7 @@ class CourseGeneralEnglishRetrieveSerializer(course_serializers.CourseSerializer
         user_course = None
         if hasattr(obj, 'user_course'):
             user_course = obj.user_course.filter(user=user).first()
-        return user_course.last_module if user_course else 0
+        return user_course.last_module if user_course else None
 
     def get_user_progress(self, obj):
         user = self.context['request'].user
@@ -30,6 +32,14 @@ class CourseGeneralEnglishRetrieveSerializer(course_serializers.CourseSerializer
             user_course = obj.user_course.filter(user=user).first()
             return user_course.get_progress if user_course else 0
         return None
+
+    def get_last_module_name(self, obj):
+        user = self.context['request'].user
+        user_course = None
+        if hasattr(obj, 'user_course'):
+            user_course = obj.user_course.filter(user=user).first()
+        last_module = user_course.last_module if user_course else 0
+        return last_module.name if last_module else None
 
 
 class CourseGeneralEnglishTrialQuestionSerializer(serializers.ModelSerializer):
