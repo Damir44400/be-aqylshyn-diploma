@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.common import mixins as common_mixins
+from apps.general_english import models as general_models
 from apps.general_english import serializers as general_serializers
 from apps.users import models as user_models
 from apps.users import serializers as user_serializers
@@ -44,8 +45,6 @@ class UserViewSet(
 
     @action(detail=False, methods=['get'], url_path='my-courses/progresses')
     def get_user_progresses(self, request):
-        user = self.request.user
-        queryset = self.queryset.prefetch_related("user_progresses").all()
-        user_progresses = queryset.filter(user_progresses__user=user)
+        user_progresses = general_models.UserProgress.objects.filter(user=request.user)
         serializer = self.get_serializer(user_progresses, many=True)
         return Response(serializer.data)
