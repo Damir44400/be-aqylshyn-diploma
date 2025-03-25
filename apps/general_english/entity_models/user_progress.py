@@ -38,6 +38,8 @@ class UserProgress(models.Model):
         modules = self.user_modules.all()
         total_count = modules.count()
         completed_count = modules.filter(is_completed=True).count()
+        if completed_count == 0:
+            return 0
         return completed_count / total_count * 100
 
     @property

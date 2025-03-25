@@ -224,14 +224,13 @@ def generate_modules(self, user_course_id, score, user_answers_log):
         user_level = "Intermediate"  # B1-B2
     else:
         user_level = "Beginner"  # A1-A2
-
     prompt = get_module_generate_prompt()
     module_payload = {
         "user_scored_english_level": user_level,
         "user_answers_log_to_test": user_answers_log,
         "user_score": score,
         "max_possible_score": 10,
-        "score_percentage": (score / 10) * 100
+        "score_percentage": (score / 10) * 100 if score > 0 else 0,
     }
 
     try:
