@@ -7,14 +7,14 @@ from apps.general_english import serializers as general_english_serializers
 
 class CourseGeneralEnglishRetrieveSerializer(course_serializers.CourseSerializer):
     last_module = serializers.SerializerMethodField()
-    user_course = serializers.SerializerMethodField()
+    user_progress = serializers.SerializerMethodField()
 
     class Meta(course_serializers.CourseSerializer.Meta):
         fields = course_serializers.CourseSerializer.Meta.fields + (
             "description",
             "duration",
             "last_module",
-            "user_course"
+            "user_progress"
         )
 
     def get_last_module(self, obj):
@@ -22,13 +22,13 @@ class CourseGeneralEnglishRetrieveSerializer(course_serializers.CourseSerializer
         user_course = None
         if hasattr(obj, 'user_course'):
             user_course = obj.user_course.filter(user=user).first()
-        return user_course.last_module if user_course else None
+        return user_course.last_module if user_course else 0
 
-    def get_user_course(self, obj):
+    def get_user_progress(self, obj):
         user = self.context['request'].user
         if hasattr(obj, 'user_course'):
             user_course = obj.user_course.filter(user=user).first()
-            return user_course.get_progress if user_course else None
+            return user_course.get_progress if user_course else 0
         return None
 
 
