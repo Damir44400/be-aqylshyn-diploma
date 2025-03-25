@@ -5,22 +5,25 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    ports:
-      - "8000:8000"
     restart: always
     depends_on:
-      - db-aqylshyn
-      - redis-aqylshyn
+      db-aqylshyn:
+        condition: service_healthy
+      redis-aqylshyn:
+        condition: service_healthy
     env_file:
       - .env
     networks:
       - network-aqylshyn
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+          cpus: "0.5"
 
   db-aqylshyn:
-    image: postgres:latest
+    image: postgres:15-alpine
     container_name: database-aqylshyn
-    ports:
-      - "5432:5432"
     restart: always
     volumes:
       - pg_data:/var/lib/postgresql/data
@@ -28,30 +31,68 @@ services:
       - network-aqylshyn
     env_file:
       - .env
+    environment:
+      POSTGRES_SHARED_BUFFERS: "64MB"
+      POSTGRES_WORK_MEM: "4MB"
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+          cpus: "0.3"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "none"
 
   redis-aqylshyn:
-    image: redis:latest
+    image: redis:alpine
     restart: always
-    ports:
-      - "6379:6379"
     networks:
       - network-aqylshyn
+    command: redis-server --save "" --appendonly no --maxmemory 50mb
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+          cpus: "0.2"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   celery-beat:
     build: .
     restart: always
-    command: ["celery", "-A", "core", "beat", "--loglevel=info"]
+    command: ["celery", "-A", "core", "beat", "--loglevel=warning"]
     depends_on:
-      - redis-aqylshyn
-      - be-aqylshyn
+      redis-aqylshyn:
+        condition: service_healthy
+      be-aqylshyn:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+          cpus: "0.1"
 
   celery-worker:
     build: .
     restart: always
-    command: [ "celery", "-A", "core", "worker", "--loglevel=info" ]
+    command: ["celery", "-A", "core", "worker", "--loglevel=warning", "--concurrency=1"]
     depends_on:
-      - redis-aqylshyn
-      - be-aqylshyn
+      redis-aqylshyn:
+        condition: service_healthy
+      be-aqylshyn:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 150M
+          cpus: "0.3"
 
 volumes:
   pg_data: {}
