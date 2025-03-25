@@ -45,3 +45,10 @@ def check_module_completion(sender, instance, created, **kwargs):
     if writing_completed and reading_completed and speaking_completed and listening_completed:
         module.is_completed = True
         module.save()
+
+    user_progress = models.UserProgress.objects.filter(
+        user=module.user_course.user,
+    ).first()
+
+    user_progress.last_module = module
+    user_progress.save()
