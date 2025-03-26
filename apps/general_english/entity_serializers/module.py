@@ -5,20 +5,49 @@ from .listenings.listening_question import ListeningQuestionSerializer
 from .readings.reading import ReadingSerializer
 from .speaking import SpeakingSerializer
 from .writing import WritingSerializer
+from ...common import enums
 
 
 class ModuleSerializer(serializers.ModelSerializer):
+    total_score = serializers.SerializerMethodField()
+    sections = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Module
         fields = (
             'id',
             'name',
             'is_completed',
-            'has_writing',
-            'has_reading',
-            'has_listening',
-            'has_speaking',
+            'total_score',
+            'sections',
         )
+
+    def get_score(self, obj, section_type):
+        score_obj = models.ModuleScore.objects.filter(
+            module=obj,
+            section=getattr(enums.ModuleSectionType, section_type.upper())
+        ).first()
+        return score_obj.score if score_obj else None
+
+    def get_sections(self, obj):
+        sections = {}
+        for section in ['writing', 'reading', 'listening', 'speaking']:
+            has_field = getattr(obj, f'has_{section}')
+            score = self.get_score(obj, section) if has_field else None
+            sections[section] = {
+                'has_section': has_field,
+                'already_passed': score is not None and score > 0,
+                'score': score,
+            }
+        return sections
+
+    def get_total_score(self, obj):
+        total = 0
+        for section in ['writing', 'reading', 'listening', 'speaking']:
+            has_field = getattr(obj, f'has_{section}')
+            score = self.get_score(obj, section) if has_field else 0
+            total += score or 0
+        return total
 
 
 class ModuleReadingSerializer(serializers.ModelSerializer):
@@ -56,8 +85,10 @@ class ModuleListeningSerializer(serializers.ModelSerializer):
             "listening_questions",
         )
 
+
 class ModuleSpeakingSerializer(serializers.ModelSerializer):
     speakings = SpeakingSerializer(many=True)
+
     class Meta:
         model = models.Module
         fields = (
