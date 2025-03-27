@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.urls import reverse, path
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -42,3 +43,12 @@ class CourseAdmin(admin.ModelAdmin):
                  name="create_tests_for_course"),
         ]
         return custom_urls + urls
+
+    def save_model(self, request, obj, form, change):
+        if obj.type == common_enums.CourseType.IELTS:
+            existing = models.Course.objects.filter(type=common_enums.CourseType.IELTS)
+            if not change and existing.exists():
+                raise ValidationError(_("IELTS course can only be created once."))
+
+        super().save_model(request, obj, form, change)
+        self.message_user(request, _("Course saved successfully."))

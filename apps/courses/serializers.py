@@ -17,6 +17,7 @@ class CourseSerializer(serializers.ModelSerializer):
             'has_level_define',
             "trial_passed",
             "user_progress",
+            "type",
         )
 
     def get_modules_count(self, obj):

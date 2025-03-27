@@ -102,7 +102,7 @@ def _create_writing_for_module(created_module, user_level):
             logger.error(f"Attempt {attempt + 1} failed: {e}")
             attempt += 1
             continue
-
+        print(response_data)
         writing_data = response_data.get('writing', {})
         if writing_data:
             break
@@ -110,7 +110,7 @@ def _create_writing_for_module(created_module, user_level):
             logger.error(f"Failed to create writing for module {created_module.name}.")
             return
         attempt += 1
-
+    print(writing_data)
     general_english_models.Writing.objects.create(
         title=writing_data.get('title', ''),
         requirements=writing_data.get('requirements', ''),

@@ -17,3 +17,20 @@ class ModuleSectionType(models.TextChoices):
     WRITING = "WRITING", _("Writing")
     LISTENING = "LISTENING", _("LISTENING")
     SPEAKING = "SPEAKING", _("Speaking")
+
+
+class DifficultyType(models.TextChoices):
+    EASY = "EASY", _("Easy")
+    MEDIUM = "MEDIUM", _("Medium")
+    HARD = "HARD", _("Hard")
+
+
+class IeltsReadingQuestionType(models.TextChoices):
+    FILL_BLANK = 'FILL', _('Fill in the Blank')
+    SELECT_INSERT_ANSWER = 'SELECT_INSERT_ANSWER', _('Select and place in correct order')
+    OPTIONS = 'OPTIONS', _('Multiple Choice Options')
+
+
+class IeltsListeningQuestionType(models.TextChoices):
+    FILL_BLANK = 'FILL', _('Fill in the Blank')
+    OPTIONS = 'OPTIONS', _('Multiple Choice Options')

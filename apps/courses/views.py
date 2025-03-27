@@ -25,8 +25,8 @@ class CourseViewSet(
     queryset = courses_models.Course.objects.all()
 
     @extend_schema(tags=["general-english"])
-    @action(detail=False, methods=["get"], url_path="general-english-modules")
+    @action(detail=True, methods=["get"], url_path="modules")
     def general_english_modules(self, request, pk=None):
-        instance = self.get_queryset().filter(type=enums.CourseType.GENERAL_ENGLISH)
-        serializer = self.get_serializer(instance, context={"request": request}, many=True)
+        instance = self.get_queryset().filter(type=enums.CourseType.GENERAL_ENGLISH).filter(id=pk).first()
+        serializer = self.get_serializer(instance, context={"request": request})
         return Response(serializer.data)

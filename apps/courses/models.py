@@ -10,7 +10,7 @@ class Course(models.Model):
     duration = models.PositiveIntegerField(verbose_name=_("Курс ұзақтығы"))
     description = models.CharField(verbose_name=_("Курс түсініктемесі"), null=True, blank=True)
     has_level_define = models.BooleanField(default=False, verbose_name=_("Деңгей анықтау барма"))
-    type = models.CharField(choices=enums.CourseType.choices, unique=True)
+    type = models.CharField(choices=enums.CourseType.choices, default=enums.CourseType.GENERAL_ENGLISH)
 
     def __str__(self):
         return self.name
