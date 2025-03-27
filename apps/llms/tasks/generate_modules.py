@@ -1,6 +1,8 @@
 import logging
+import uuid
 
 from celery import shared_task
+from django.core.files.base import ContentFile
 from django.db import transaction
 
 from apps.general_english import models as general_english_models
@@ -156,8 +158,9 @@ def _create_listening_for_module(created_module, user_level):
     for question_data in listening_questions:
         context = question_data.get('context', '')
         voice = elevenlab.send_request(context)
+        voice_file = ContentFile(voice, name=f"{uuid.uuid4()}.wav")
         listening_question_obj = general_english_models.ListeningQuestion.objects.create(
-            audio_question=voice,
+            audio_question=voice_file,
             context=context,
             module_id=created_module.pk
         )
