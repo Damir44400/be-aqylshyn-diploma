@@ -40,7 +40,7 @@ services:
           memory: 300M
           cpus: "0.3"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -59,7 +59,7 @@ services:
           memory: 100M
           cpus: "0.2"
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -67,7 +67,7 @@ services:
   celery-beat:
     build: .
     restart: always
-    command: ["celery", "-A", "core", "beat", "--loglevel=warning"]
+    command: [ "celery", "-A", "core", "beat", "--loglevel=warning" ]
     depends_on:
       redis-aqylshyn:
         condition: service_healthy
@@ -78,11 +78,13 @@ services:
         limits:
           memory: 100M
           cpus: "0.1"
+    networks:
+      - network-aqylshyn
 
   celery-worker:
     build: .
     restart: always
-    command: ["celery", "-A", "core", "worker", "--loglevel=warning", "--concurrency=1"]
+    command: [ "celery", "-A", "core", "worker", "--loglevel=warning", "--concurrency=1" ]
     depends_on:
       redis-aqylshyn:
         condition: service_healthy
@@ -93,9 +95,11 @@ services:
         limits:
           memory: 150M
           cpus: "0.3"
+    networks:
+      - network-aqylshyn
 
 volumes:
-  pg_data: {}
+  pg_data: { }
 
 networks:
-  network-aqylshyn: {}
+  network-aqylshyn: { }
