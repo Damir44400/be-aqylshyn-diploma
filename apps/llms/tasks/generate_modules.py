@@ -102,10 +102,9 @@ def _create_writing_for_module(created_module, user_level):
             logger.error(f"Attempt {attempt + 1} failed: {e}")
             attempt += 1
             continue
-        print(response_data)
-        writing_data = response_data.get('writing', {})
-        if writing_data:
-            break
+        writing_data = response_data
+        if writing_data and 'writing' in writing_data:
+            writing_data = writing_data.get('writing')
         elif attempt == MAX_ATTEMPT - 1:
             logger.error(f"Failed to create writing for module {created_module.name}.")
             return
