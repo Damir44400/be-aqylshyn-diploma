@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('general_english', '0002_initial'),
     ]
@@ -22,7 +21,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='readingquestion',
             name='context',
-            field=models.TextField(default='default', help_text='Бұл сұрақ қатысты мәтін үзіндісі', verbose_name='Оқу мәтіні'),
+            field=models.TextField(default='default', help_text='Бұл сұрақ қатысты мәтін үзіндісі',
+                                   verbose_name='Оқу мәтіні'),
             preserve_default=False,
         ),
         migrations.AddField(
@@ -33,7 +33,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='readingquestion',
             name='module',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='readings', to='general_english.module', verbose_name='Қай модульге тиесілі'),
+            field=models.ForeignKey(null=True, default=None, on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='readings', to='general_english.module',
+                                    verbose_name='Қай модульге тиесілі'),
             preserve_default=False,
         ),
         migrations.AddField(
