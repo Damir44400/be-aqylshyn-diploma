@@ -92,6 +92,7 @@ LOCAL_APPS = [
     'apps.auths.apps.AuthsConfig',
     'apps.general_english.apps.GeneralEnglishConfig',
     'apps.courses.apps.CoursesConfig',
+    'apps.ielts.apps.IeltsConfig',
 ]
 
 THIRD_PARTY_APPS = [

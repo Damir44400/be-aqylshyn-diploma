@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class IeltsConfig(AppConfig):
+class MessengerConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.ielts'
+    name = 'messenger'

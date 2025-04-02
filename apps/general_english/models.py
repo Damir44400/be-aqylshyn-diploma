@@ -3,7 +3,6 @@ from .entity_models.listenings.listening_option import ListeningOption
 from .entity_models.listenings.listening_question import ListeningQuestion
 from .entity_models.module import Module
 from .entity_models.module_score import ModuleScore
-from .entity_models.readigns.reading import Reading
 from .entity_models.readigns.reading_option import ReadingOption
 from .entity_models.readigns.reading_question import ReadingQuestion
 from .entity_models.speaking import Speaking
@@ -16,7 +15,6 @@ __all__ = [
     TrialQuestion,
     TrialOption,
     UserProgress,
-    Reading,
     Speaking,
     ReadingQuestion,
     ReadingOption,

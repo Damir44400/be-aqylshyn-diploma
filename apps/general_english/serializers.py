@@ -3,7 +3,6 @@ from .entity_serializers.trial_option import TrialOptionSerializer
 from .entity_serializers.user_progress import UserProgressSerializer
 from .entity_serializers.trial_test import TrialQuestionPassSerializer
 from .entity_serializers.trial_test import TrialTestSerializer
-from .entity_serializers.readings.reading import ReadingSerializer
 from .entity_serializers.readings.reading_option import ReadingOptionSerializer
 from .entity_serializers.readings.reading_question import ReadingQuestionSerializer
 from .entity_serializers.module import ModuleReadingSerializer

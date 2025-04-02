@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.general_english import models
 from .listenings.listening_question import ListeningQuestionSerializer
-from .readings.reading import ReadingSerializer
+from .readings.reading_question import ReadingQuestionSerializer
 from .speaking import SpeakingSerializer
 from .writing import WritingSerializer
 from ...common import enums
@@ -51,14 +51,14 @@ class ModuleSerializer(serializers.ModelSerializer):
 
 
 class ModuleReadingSerializer(serializers.ModelSerializer):
-    reading = ReadingSerializer(many=False)
+    readings = ReadingQuestionSerializer(many=True)
 
     class Meta:
         model = models.Module
         fields = (
             'id',
             'name',
-            'reading',
+            'readings',
         )
 
 

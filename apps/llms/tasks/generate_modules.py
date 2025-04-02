@@ -1,6 +1,8 @@
 import logging
 import uuid
 
+import requests
+from bs4 import BeautifulSoup
 from celery import shared_task
 from django.core.files.base import ContentFile
 from django.db import transaction
@@ -26,7 +28,7 @@ def _create_reading_for_module(created_module, user_level):
         "user_level": user_level,
     }
     attempt = 0
-    reading_data = None
+    questions = None
     while attempt < MAX_ATTEMPT:
         response = openai_cli.OpenAICLI().send_request(
             reading_prompt,
@@ -47,26 +49,29 @@ def _create_reading_for_module(created_module, user_level):
             attempt += 1
             continue
 
-        reading_data = response_data.get('reading', {})
-        if reading_data:
+        questions = response_data.get('questions', [])
+        if questions:
             break
         elif attempt == MAX_ATTEMPT - 1:
             logger.error(f"Failed to create reading for module {created_module.name}.")
             return
         attempt += 1
 
-    reading_obj = general_english_models.Reading.objects.create(
-        context=reading_data.get('context', ''),
-        source=reading_data.get('source', ''),
-        image=reading_data.get('image', ''),
-        module_id=created_module.pk
-    )
-
-    questions = reading_data.get('questions', [])
     for question_data in questions:
+        image_query = question_data.get('image', '')
+        search_url = f"https://www.google.com/search?q={image_query}&tbm=isch"
+        headers = {"User-Agent": "Mozilla/5.0"}
+
+        google_response = requests.get(search_url, headers=headers)
+        soup = BeautifulSoup(google_response.text, "html.parser")
+        first_img_tag = soup.find("img")
+
+        image_src = first_img_tag["src"] if first_img_tag else None
         question_obj = general_english_models.ReadingQuestion.objects.create(
-            question=question_data.get('question', ''),
-            reading=reading_obj
+            context=question_data.get('context', ''),
+            source=question_data.get('source', ''),
+            image=image_src,
+            module_id=created_module.pk
         )
 
         options = question_data.get('options', [])
@@ -277,22 +282,16 @@ def generate_modules(self, user_course_id, score, user_answers_log):
                     name=module_info.get('name', f'Module {i}'),
                     user_course=user_course,
                     improvement=module_info.get('improvement', ''),
-                    has_writing=module_info.get('has_writing', True),
-                    has_reading=module_info.get('has_reading', True),
-                    has_listening=module_info.get('has_listening', True),
-                    has_speaking=module_info.get('has_speaking', True)
+                    has_writing=module_info.get(True),
+                    has_reading=module_info.get(True),
+                    has_listening=module_info.get(True),
+                    has_speaking=module_info.get(True)
                 )
 
-                if created_module.has_reading:
-                    _create_reading_for_module(created_module, user_level)
-
-                if created_module.has_writing:
-                    _create_writing_for_module(created_module, user_level)
-
-                if created_module.has_listening:
-                    _create_listening_for_module(created_module, user_level)
-                if created_module.has_speaking:
-                    _create_speaking_for_module(created_module, user_level)
+                _create_reading_for_module(created_module, user_level)
+                _create_writing_for_module(created_module, user_level)
+                _create_listening_for_module(created_module, user_level)
+                _create_speaking_for_module(created_module, user_level)
             return True
 
     except Exception as e:

@@ -10,6 +10,8 @@ class ReadingQuestionSerializer(serializers.ModelSerializer):
         model = models.ReadingQuestion
         fields = (
             'id',
-            'question',
-            'options'
+            'context',
+            'image',
+            'source',
+            'options',
         )
