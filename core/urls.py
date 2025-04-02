@@ -19,20 +19,22 @@ urlpatterns += i18n_patterns(
     prefix_default_language=False
 )
 
+urlpatterns += static(
+    settings.MEDIA_URL,
+    document_root=settings.MEDIA_ROOT,
+)
+
+urlpatterns += static(
+    settings.STATIC_URL,
+    document_root=settings.STATIC_ROOT,
+)
+
 if settings.DEBUG:
     urlpatterns += [
-        path("zschema", SpectacularAPIView.as_view(), name="schema"),
+        path("_schema", SpectacularAPIView.as_view(), name="schema"),
         path(
             "swagger/",
             SpectacularSwaggerView.as_view(url_name="schema"),
             name="swagger",
         ),
     ]
-    urlpatterns += static(
-        settings.MEDIA_URL,
-        document_root=settings.MEDIA_ROOT,
-    )
-    urlpatterns += static(
-        settings.STATIC_URL,
-        document_root=settings.STATIC_ROOT,
-    )
