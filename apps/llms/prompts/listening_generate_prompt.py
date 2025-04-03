@@ -18,6 +18,7 @@ CONTENT REQUIREMENTS:
    - Vocabulary in context
 4. Context should include sufficient information to answer the question
 5. Include variety in scenarios (formal/informal, personal/professional)
+6. The question text must be between 50 and 100 characters in length
 
 ANSWER OPTIONS:
 1. Each question must have exactly 4 options (A, B, C, D)
@@ -32,7 +33,7 @@ Return valid JSON only with this exact structure:
   "listening_questions": [
     {
       "context": "Complete transcript of what would be heard in the audio",
-      "question": "The specific question about the audio",
+      "question": "The specific question about the audio (50-100 characters)",
       "options": [
         {
           "option": "Option text",

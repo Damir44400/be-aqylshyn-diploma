@@ -92,31 +92,32 @@ def _create_writing_for_module(created_module, user_level):
     }
     attempt = 0
     writing_data = None
+
     while attempt < MAX_ATTEMPT:
         response = openai_cli.OpenAICLI().send_request(
             writing_prompt,
             data=(
-                    f"Module Improvement: {writing_payload['module_improvement']}" +
-                    f"Module Name: {writing_payload['module_name']}" +
-                    f"User Level: {writing_payload['user_level']}"
+                f"Module Improvement: {writing_payload['module_improvement']}\n"
+                f"Module Name: {writing_payload['module_name']}\n"
+                f"User Level: {writing_payload['user_level']}"
             )
         )
         response_text = response.text if hasattr(response, 'text') else response
 
         try:
-            response_data = parse_json_response(response_text)
+            parsed = parse_json_response(response_text)
+            writing_data = parsed.get('writing')
+            if writing_data:  # ✅ Успешно
+                break
         except ValueError as e:
-            logger.error(f"Attempt {attempt + 1} failed: {e}")
-            attempt += 1
-            continue
-        writing_data = response_data
-        if writing_data and 'writing' in writing_data:
-            writing_data = writing_data.get('writing')
-        elif attempt == MAX_ATTEMPT - 1:
-            logger.error(f"Failed to create writing for module {created_module.name}.")
-            return
+            logger.error(f"Attempt {attempt + 1} failed to parse JSON: {e}")
+
         attempt += 1
-    print(writing_data)
+
+    if not writing_data:
+        logger.error(f"Failed to create writing for module {created_module.name}. No valid response.")
+        return
+
     general_english_models.Writing.objects.create(
         title=writing_data.get('title', ''),
         requirements=writing_data.get('requirements', ''),
