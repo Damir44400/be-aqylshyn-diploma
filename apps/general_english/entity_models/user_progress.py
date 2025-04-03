@@ -29,6 +29,10 @@ class UserProgress(models.Model):
         verbose_name=_("Тоқтаған модуль"),
         null=True,
     )
+    level = models.CharField(
+        null=True,
+        verbose_name=_("Қолданушы уровеньі"),
+    )
 
     class Meta:
         unique_together = ("course", "user")

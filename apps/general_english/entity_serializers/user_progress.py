@@ -17,7 +17,8 @@ class UserProgressSerializer(serializers.ModelSerializer):
             "last_module",
             "last_module_name",
             "progress_percentage",
-            "modules_count"
+            "modules_count",
+            "level",
         ]
 
     def get_course_name(self, obj):
