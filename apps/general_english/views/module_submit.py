@@ -1,5 +1,5 @@
 from drf_spectacular.utils import extend_schema
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -21,6 +21,7 @@ class ModuleSubmitsView(
     }
 
     service = module_submit.ModuleSubmitService()
+    permission_classes = [permissions.IsAuthenticated]
 
     def _handle_module_submission(self, request, module_id, submit_method, success_message, type):
         serializer = self.get_serializer(data=request.data)
@@ -83,7 +84,7 @@ class ModuleSubmitsView(
             enums.ModuleSectionType.SPEAKING
         )
 
-    @action(detail=False, methods=['post'], url_path='<module_id>/writing')
+    @action(detail=False, methods=['post'], url_path='(?P<module_id>\d+)/writing')
     def submit_writing(self, request, module_id):
         return self._handle_module_submission(
             request,

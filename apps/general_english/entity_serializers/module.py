@@ -63,7 +63,7 @@ class ModuleReadingSerializer(serializers.ModelSerializer):
 
 
 class ModuleWritingSerializer(serializers.ModelSerializer):
-    writing = WritingSerializer(many=True)
+    writing = WritingSerializer(many=False)
 
     class Meta:
         model = models.Module

@@ -18,7 +18,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
+      - media:/app/media
 
   db-aqylshyn:
     image: postgres:15-alpine
@@ -89,6 +89,7 @@ services:
 
 volumes:
   pg_data: { }
+  media: { }
 
 networks:
   network-aqylshyn: { }
