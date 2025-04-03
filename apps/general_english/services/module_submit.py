@@ -2,9 +2,13 @@ import math
 
 import nltk
 
-from apps.common import enums as common_enums
-from apps.general_english import models as general_english_models
-from apps.llms.tasks.essay_checker import essay_checker
+from apps.common import enums as common_enums, enums
+from apps.general_english import models as general_english_models, models
+from apps.llms import openai_cli
+from apps.llms.prompts.essay_checker_prompt import get_essay_checker_prompt
+from apps.llms.tasks import parse_json_response
+
+MAX_ATTEMPTS = 3
 
 
 class ModuleSubmitService:
@@ -26,22 +30,19 @@ class ModuleSubmitService:
             return max_score
 
         normalized_score = max_score * math.exp(-distance / max_length)
-
         return max(0, min(normalized_score, max_score))
 
     def submit_option_answers(self, data, module_id):
         score = 0
         section = data['section_name']
 
-        module_score = general_english_models.ModuleScore.objects.filter(
+        existing_score = general_english_models.ModuleScore.objects.filter(
             module_id=module_id, section=section
         ).first()
-
-        if module_score:
-            module_score.delete()
+        if existing_score:
+            existing_score.delete()
 
         module_questions = self._get_module_questions(module_id, section)
-
         if not module_questions:
             return 0
 
@@ -49,8 +50,12 @@ class ModuleSubmitService:
             question_id = option.get('question_id')
             option_id = option.get('option_id')
 
-            question = module_questions.filter(id=question_id).prefetch_related('options').first()
-
+            question = (
+                module_questions
+                .filter(id=question_id)
+                .prefetch_related('options')
+                .first()
+            )
             if not question:
                 continue
 
@@ -70,10 +75,10 @@ class ModuleSubmitService:
         section = data['section_name']
 
         general_english_models.ModuleScore.objects.filter(
-            module=module_id, section=section
+            module_id=module_id, section=section
         ).delete()
 
-        db_speakings = general_english_models.Speaking.objects.filter(module=module_id)
+        db_speakings = general_english_models.Speaking.objects.filter(module_id=module_id)
         if not db_speakings:
             return 0
 
@@ -92,7 +97,6 @@ class ModuleSubmitService:
             section=section,
             score=score,
         )
-
         return score
 
     def submit_writing_answers(self, data, module_id):
@@ -103,14 +107,43 @@ class ModuleSubmitService:
         ).delete()
 
         writing_data = data.get("writing")
-        module = general_english_models.Module.objects.filter(
-            module_id=module_id
-        ).prefetch_related('writing').first()
-        writing = module.writing
-
-        if not writing:
+        module = (
+            general_english_models.Module.objects
+            .filter(module_id=module_id)
+            .prefetch_related('writing')
+            .first()
+        )
+        if not module or not module.writing:
             return None
 
-        task_id = essay_checker.delay(writing.id, writing_data.get("text"))
+        db_writing = module.writing
 
-        return task_id
+        prompt = get_essay_checker_prompt()
+
+        score = 0.0
+        attempt = 0
+        while attempt < MAX_ATTEMPTS:
+            response = openai_cli.OpenAICLI().send_request(
+                system_prompt=prompt,
+                data=f"requirements: {db_writing.requirements}\nuser answer: {writing_data}"
+            )
+
+            response_text = response.text if hasattr(response, 'text') else response
+
+            try:
+                parsed_response = parse_json_response(response_text)
+            except ValueError:
+                attempt += 1
+                continue
+
+            score = parsed_response.get('score', 0)
+            if score:
+                break
+            attempt += 1
+
+        module_score = models.ModuleScore.objects.create(
+            module_id=module_id,
+            section=enums.ModuleSectionType.WRITING,
+            score=float(score),
+        )
+        return module_score

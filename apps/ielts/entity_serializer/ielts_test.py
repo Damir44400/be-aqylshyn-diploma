@@ -1,4 +1,3 @@
-from drf_spectacular.extensions import OpenApiSerializerExtension
 from rest_framework import serializers
 
 from apps.ielts import models as ielts_models
@@ -14,7 +13,7 @@ class IeltsTestSerializer(serializers.ModelSerializer):
             "id",
             "name"
         )
-OpenApiSerializerExtension
+
 
 class IeltsTestDetailSerializer(IeltsTestSerializer):
     readings = reading.IeltsReadingSerializer(many=True)

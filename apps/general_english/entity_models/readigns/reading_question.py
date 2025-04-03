@@ -12,5 +12,5 @@ class ReadingQuestion(models.Model):
         general_english_models.Module,
         on_delete=models.CASCADE,
         verbose_name=_("Қай модульге тиесілі"),
-        related_name="readings",
+        related_name="readings"
     )
