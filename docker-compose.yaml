@@ -17,9 +17,8 @@ services:
       - network-aqylshyn
     ports:
       - "8000:8000"
-
     volumes:
-      - .:/
+      - .:/app
 
   db-aqylshyn:
     image: postgres:15-alpine
