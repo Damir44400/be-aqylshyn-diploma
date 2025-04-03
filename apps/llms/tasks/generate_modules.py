@@ -43,12 +43,12 @@ def _create_reading_for_module(created_module, user_level):
         else:
             response_text = response
         try:
+            print(response_text)
             response_data = parse_json_response(response_text)
         except ValueError as e:
             logger.error(f"Attempt {attempt + 1} failed: {e}")
             attempt += 1
             continue
-
         questions = response_data.get('questions', [])
         if questions:
             break
@@ -103,7 +103,7 @@ def _create_writing_for_module(created_module, user_level):
             )
         )
         response_text = response.text if hasattr(response, 'text') else response
-
+        print(response_text)
         try:
             parsed = parse_json_response(response_text)
             writing_data = parsed.get('writing')
@@ -147,6 +147,7 @@ def _create_listening_for_module(created_module, user_level):
         response_text = response.text if hasattr(response, 'text') else response
 
         try:
+            print(response_text)
             response_data = parse_json_response(response_text)
         except ValueError as e:
             logger.error(f"Attempt {attempt + 1} failed: {e}")
@@ -203,6 +204,7 @@ def _create_speaking_for_module(created_module, user_level):
         else:
             response_text = response
         try:
+            print(response_text)
             response_data = parse_json_response(response_text)
         except ValueError as e:
             logger.error(f"Attempt {attempt + 1} failed: {e}")

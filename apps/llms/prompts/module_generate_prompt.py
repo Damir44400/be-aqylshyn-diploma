@@ -29,11 +29,7 @@ Return valid JSON matching this exact structure:
   "modules": [
     {
       "name": "Descriptive module title",
-      "improvement": "Detailed explanation of what skills this module develops and specific learning objectives",
-      "has_writing": boolean,
-      "has_reading": boolean,
-      "has_listening": boolean,
-      "has_speaking": boolean
+      "improvement": "Detailed explanation of what skills this module develops and specific learning objectives"
     },
     // Additional module objects
   ]
