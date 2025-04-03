@@ -72,11 +72,6 @@ services:
         condition: service_healthy
       be-aqylshyn:
         condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          memory: 100M
-          cpus: "0.1"
     networks:
       - network-aqylshyn
 
@@ -89,11 +84,6 @@ services:
         condition: service_healthy
       be-aqylshyn:
         condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          memory: 150M
-          cpus: "0.3"
     networks:
       - network-aqylshyn
 
