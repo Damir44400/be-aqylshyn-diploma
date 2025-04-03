@@ -5,7 +5,7 @@ from apps.common import enums as common_enums
 
 
 class TrialQuestion(models.Model):
-    question = models.CharField(max_length=200, verbose_name=_("Сұрақ мәтіні"))
+    question = models.TextField(verbose_name=_("Сұрақ мәтіні"))
     question_type = models.CharField(
         choices=common_enums.QuestionType.choices,
         verbose_name=_("Сұрақ типі"),
