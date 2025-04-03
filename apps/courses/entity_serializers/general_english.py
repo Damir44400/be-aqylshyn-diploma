@@ -21,10 +21,9 @@ class CourseGeneralEnglishRetrieveSerializer(course_serializers.CourseSerializer
 
     def get_last_module(self, obj):
         user = self.context['request'].user
-        user_course = None
-        if hasattr(obj, 'user_course'):
-            user_course = obj.user_course.filter(user=user).first()
-        return user_course.last_module if user_course else None
+        user_course = obj.user_course.filter(user=user).first() if hasattr(obj, "user_course") else None
+        module = user_course.last_module if user_course else None
+        return module.id if module else None
 
     def get_user_progress(self, obj):
         user = self.context['request'].user
@@ -38,7 +37,7 @@ class CourseGeneralEnglishRetrieveSerializer(course_serializers.CourseSerializer
         user_course = None
         if hasattr(obj, 'user_course'):
             user_course = obj.user_course.filter(user=user).first()
-        last_module = user_course.last_module if user_course else 0
+        last_module = user_course.last_module if user_course else None
         return last_module.name if last_module else None
 
 

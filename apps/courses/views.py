@@ -1,5 +1,5 @@
 from drf_spectacular.utils import extend_schema
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -27,6 +27,9 @@ class CourseViewSet(
     @extend_schema(tags=["general-english"])
     @action(detail=True, methods=["get"], url_path="modules")
     def general_english_modules(self, request, pk=None):
-        instance = self.get_queryset().filter(type=enums.CourseType.GENERAL_ENGLISH).filter(id=pk).first()
+        queryset = self.get_queryset()
+        instance = queryset.filter(type=enums.CourseType.GENERAL_ENGLISH).filter(id=pk).first()
+        if not instance:
+            return Response(status=status.HTTP_404_NOT_FOUND, data={"detail": "Course not found"})
         serializer = self.get_serializer(instance, context={"request": request})
         return Response(serializer.data)
