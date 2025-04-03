@@ -282,10 +282,10 @@ def generate_modules(self, user_course_id, score, user_answers_log):
                     name=module_info.get('name', f'Module {i}'),
                     user_course=user_course,
                     improvement=module_info.get('improvement', ''),
-                    has_writing=module_info.get(True),
-                    has_reading=module_info.get(True),
-                    has_listening=module_info.get(True),
-                    has_speaking=module_info.get(True)
+                    has_writing=True,
+                    has_reading=True,
+                    has_listening=True,
+                    has_speaking=True
                 )
 
                 _create_reading_for_module(created_module, user_level)
