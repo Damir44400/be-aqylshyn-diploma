@@ -19,6 +19,7 @@ CONTENT REQUIREMENTS:
 4. Context should include sufficient information to answer the question
 5. Include variety in scenarios (formal/informal, personal/professional)
 6. The question text must be between 50 and 100 characters in length
+7. The question texts count must be between 7-10 words in length
 
 ANSWER OPTIONS:
 1. Each question must have exactly 4 options (A, B, C, D)
