@@ -63,7 +63,7 @@ class ModuleReadingSerializer(serializers.ModelSerializer):
 
 
 class ModuleWritingSerializer(serializers.ModelSerializer):
-    writing = WritingSerializer(many=False)
+    writing = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Module
@@ -72,6 +72,9 @@ class ModuleWritingSerializer(serializers.ModelSerializer):
             "name",
             "writing",
         )
+
+    def get_writing(self, obj):
+        return models.Writing.objects.filter(module=obj).first()
 
 
 class ModuleListeningSerializer(serializers.ModelSerializer):
