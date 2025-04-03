@@ -74,7 +74,10 @@ class ModuleWritingSerializer(serializers.ModelSerializer):
         )
 
     def get_writing(self, obj):
-        return models.Writing.objects.filter(module=obj).first()
+        instance = models.Writing.objects.filter(module=obj).first()
+        if instance:
+            return WritingSerializer(instance, many=False).data
+        return {}
 
 
 class ModuleListeningSerializer(serializers.ModelSerializer):
