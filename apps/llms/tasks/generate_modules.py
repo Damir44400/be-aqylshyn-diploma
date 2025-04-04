@@ -1,12 +1,12 @@
 import logging
 import uuid
 
-import requests
-from bs4 import BeautifulSoup
 from celery import shared_task
 from django.core.files.base import ContentFile
 from django.db import transaction
+from elevenlabs import save
 
+from apps.common.utils import get_image_url
 from apps.general_english import models as general_english_models
 from apps.llms import openai_cli, elevenlab_cli
 from apps.llms.prompts.listening_generate_prompt import get_listening_generate_prompt
@@ -15,6 +15,7 @@ from apps.llms.prompts.reading_generate_prompt import get_reading_prompt
 from apps.llms.prompts.speaking_generate_prompt import get_speaking_prompt
 from apps.llms.prompts.writing_generate_prompt import get_writing_prompt
 from apps.llms.tasks import parse_json_response
+from core.settings import MEDIA_ROOT
 
 logger = logging.getLogger(__name__)
 MAX_ATTEMPT = 3
@@ -59,18 +60,11 @@ def _create_reading_for_module(created_module, user_level):
 
     for question_data in questions:
         image_query = question_data.get('image', '')
-        search_url = f"https://www.google.com/search?q={image_query}&tbm=isch"
-        headers = {"User-Agent": "Mozilla/5.0"}
 
-        google_response = requests.get(search_url, headers=headers)
-        soup = BeautifulSoup(google_response.text, "html.parser")
-        first_img_tag = soup.find("img")
-
-        image_src = first_img_tag["src"] if first_img_tag else None
         question_obj = general_english_models.ReadingQuestion.objects.create(
             context=question_data.get('context', ''),
             source=question_data.get('source', ''),
-            image=image_src,
+            image=get_image_url(image_query),
             module_id=created_module.pk
         )
 
@@ -165,9 +159,9 @@ def _create_listening_for_module(created_module, user_level):
     for question_data in listening_questions:
         context = question_data.get('context', '')
         voice = elevenlab.send_request(context)
-        voice_file = ContentFile(voice, name=f"{uuid.uuid4()}.wav")
+        save(voice, filename=f"{MEDIA_ROOT}/{uuid.uuid4()}.wav")
         listening_question_obj = general_english_models.ListeningQuestion.objects.create(
-            audio_question=voice_file,
+            audio_question=f"{MEDIA_ROOT}/{uuid.uuid4()}.wav",
             context=context,
             module_id=created_module.pk
         )
