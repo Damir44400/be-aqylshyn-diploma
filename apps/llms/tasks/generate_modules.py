@@ -4,6 +4,7 @@ import uuid
 
 from celery import shared_task
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.db import transaction
 from elevenlabs import save
 
@@ -159,15 +160,15 @@ def _create_listening_for_module(created_module, user_level):
     for question_data in listening_questions:
         context = question_data.get('context', '')
         voice = elevenlab.send_request(context)
-        unique_filename = f"{uuid.uuid4()}.wav"
-        full_path = os.path.join(settings.MEDIA_ROOT, unique_filename)
+        audio_file = ContentFile(voice)
 
-        save(voice, filename=full_path)
+        unique_filename = f"{uuid.uuid4()}.wav"
         listening_question_obj = general_english_models.ListeningQuestion.objects.create(
-            audio_question=unique_filename,
             context=context,
             module_id=created_module.pk
         )
+
+        listening_question_obj.audio_question.save(unique_filename, audio_file)
 
         options_data = question_data.get('options', [])
         for option_data in options_data:
