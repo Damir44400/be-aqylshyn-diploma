@@ -3,6 +3,7 @@ import os
 import uuid
 
 from celery import shared_task
+from django.conf import settings
 from django.db import transaction
 from elevenlabs import save
 
@@ -15,7 +16,6 @@ from apps.llms.prompts.reading_generate_prompt import get_reading_prompt
 from apps.llms.prompts.speaking_generate_prompt import get_speaking_prompt
 from apps.llms.prompts.writing_generate_prompt import get_writing_prompt
 from apps.llms.tasks import parse_json_response
-from core.settings import MEDIA_ROOT
 
 logger = logging.getLogger(__name__)
 MAX_ATTEMPT = 3
@@ -160,7 +160,7 @@ def _create_listening_for_module(created_module, user_level):
         context = question_data.get('context', '')
         voice = elevenlab.send_request(context)
         unique_filename = f"{uuid.uuid4()}.wav"
-        full_path = os.path.join(MEDIA_ROOT, unique_filename)
+        full_path = os.path.join(settings.MEDIA_ROOT, unique_filename)
 
         save(voice, filename=full_path)
         listening_question_obj = general_english_models.ListeningQuestion.objects.create(
