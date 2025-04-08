@@ -1,5 +1,3 @@
-import math
-
 import nltk
 from rest_framework.exceptions import ValidationError
 
@@ -20,18 +18,17 @@ class ModuleSubmitService:
             return general_english_models.ListeningQuestion.objects.filter(module_id=module_id)
         return None
 
-    def _calculate_speaking_score(self, context, text, max_score=1.0):
+    def _calculate_speaking_score(self, context, text, max_score=1.0, tolerance=0.5):
         if not context or not text:
             return 0.0
 
         distance = nltk.edit_distance(context, text)
         max_length = max(len(context), len(text))
-
         if max_length == 0:
             return max_score
 
-        normalized_score = max_score * math.exp(-distance / max_length)
-        return max(0, min(normalized_score, max_score))
+        error_rate = distance / max_length
+        return max_score if error_rate <= tolerance else 0.0
 
     def submit_option_answers(self, data, module_id):
         score = 0
@@ -121,49 +118,53 @@ class ModuleSubmitService:
 
         prompt = get_essay_checker_prompt()
 
-        score = 0.0
-        attempt = 0
-        while attempt < MAX_ATTEMPTS:
+        score = None
+        for _attempt in range(MAX_ATTEMPTS):
             response = openai_cli.OpenAICLI().send_request(
                 system_prompt=prompt,
                 data=f"requirements: {db_writing.requirements}\nuser answer: {writing_data}"
             )
-
-            response_text = response.text if hasattr(response, 'text') else response
+            response_text = getattr(response, 'text', response)
 
             try:
                 parsed_response = parse_json_response(response_text)
             except ValueError:
-                attempt += 1
                 continue
-
-            score = parsed_response.get('score', 0)
-            if score:
+            print(parsed_response)
+            score = parsed_response.get('score')
+            if score is not None:
                 break
-            attempt += 1
+
+        if score is None:
+            raise ValidationError("Couldn't get a valid score from the writing checker.")
+
+        final_score = float(score)
 
         models.ModuleScore.objects.create(
             module_id=module_id,
             section=enums.ModuleSectionType.WRITING,
-            score=float(score),
+            score=final_score,
         )
 
         return float(score)
 
     def get_score(self, request, module_id):
         section_name = request.query_params.get('section_name')
+        if not section_name:
+            raise ValidationError("No section_name query param provided.")
+
         module = general_english_models.Module.objects.filter(id=module_id).first()
         if not module:
-            return None
-        module_score = models.ModuleScore.objects.filter(
-            module_id=module_id
-        )
-        if not module_score.exists():
-            raise ValidationError("Module not found")
+            raise ValidationError(f"Module with ID {module_id} not found.")
 
-        module_section_score = module_score.filter(section=section_name).first()
+        module_score_qs = models.ModuleScore.objects.filter(module_id=module_id)
+        if not module_score_qs.exists():
+            raise ValidationError("No scores found for this module.")
+
+        module_section_score = module_score_qs.filter(section=section_name).first()
         if not module_section_score:
-            raise ValidationError("You yet not passed the section")
+            raise ValidationError("You have not passed this section yet.")
+
         return {
             "section": section_name,
             "score": module_section_score.score,
