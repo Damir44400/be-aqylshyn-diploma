@@ -116,7 +116,7 @@ class ModuleSubmitService:
         if not module or not module.writing:
             return None
 
-        db_writing = module.writing
+        db_writing = module.writing.first()
 
         prompt = get_essay_checker_prompt()
 
