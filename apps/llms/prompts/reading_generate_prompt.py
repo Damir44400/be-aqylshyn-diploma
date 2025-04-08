@@ -28,6 +28,7 @@ Return **only valid JSON** matching the structure below:
     {
       "title": "Descriptive title related to the theme",
       "context": "Complete reading passage (length appropriate for level)",
+      "question": "Question related by to theme"
       "source": "Fictional but plausible source citation",
       "image": "Image name to search about this theme and the name should be easy to find in google about this iamge",
       "options": [

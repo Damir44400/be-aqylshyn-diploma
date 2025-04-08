@@ -6,6 +6,7 @@ from apps.general_english import models as general_english_models
 
 class ReadingQuestion(models.Model):
     context = models.TextField(_("Оқу мәтіні"), help_text=_("Бұл сұрақ қатысты мәтін үзіндісі"))
+    question = models.TextField(_("Сұрақ"), null=True, blank=True)
     image = models.URLField(_("Сурет сілтемесі"), null=True, blank=True)
     source = models.TextField(_("Дереккөз"), blank=True, null=True)
     module = models.ForeignKey(

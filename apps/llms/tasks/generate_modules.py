@@ -1,12 +1,9 @@
 import logging
-import os
 import uuid
 
 from celery import shared_task
-from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import transaction
-from elevenlabs import save
 
 from apps.common.utils import get_image_url
 from apps.general_english import models as general_english_models
@@ -64,6 +61,7 @@ def _create_reading_for_module(created_module, user_level):
 
         question_obj = general_english_models.ReadingQuestion.objects.create(
             context=question_data.get('context', ''),
+            question=question_data.get('question', ''),
             source=question_data.get('source', ''),
             image=get_image_url(image_query),
             module_id=created_module.pk
@@ -102,7 +100,7 @@ def _create_writing_for_module(created_module, user_level):
         try:
             parsed = parse_json_response(response_text)
             writing_data = parsed.get('writing')
-            if writing_data:  # ✅ Успешно
+            if writing_data:
                 break
         except ValueError as e:
             logger.error(f"Attempt {attempt + 1} failed to parse JSON: {e}")

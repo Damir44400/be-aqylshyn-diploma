@@ -109,7 +109,7 @@ class ModuleSubmitService:
         writing_data = data.get("writing")
         module = (
             general_english_models.Module.objects
-            .filter(module_id=module_id)
+            .filter(id=module_id)
             .prefetch_related('writing')
             .first()
         )

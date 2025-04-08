@@ -7,5 +7,6 @@ class SpeakingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Speaking
         fields = (
+            "id",
             'context',
         )

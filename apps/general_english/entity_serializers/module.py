@@ -22,36 +22,78 @@ class ModuleSerializer(serializers.ModelSerializer):
             'sections',
         )
 
-    def get_score(self, obj, section_type):
-        score_obj = models.ModuleScore.objects.filter(
-            module=obj,
-            section=getattr(enums.ModuleSectionType, section_type.upper())
-        ).first()
-        return score_obj.score if score_obj else None
-
     def get_sections(self, obj):
-        sections = {}
+        """
+        Возвращает структуру вида:
+        {
+            "writing": {
+                "has_section": True/False,
+                "already_passed": True/False,
+                "score": 10,
+                "max_score": 25,
+            },
+            ...
+        }
+        """
+        scores_map = {
+            score_obj.section: score_obj.score
+            for score_obj in obj.modulescore_set.all()
+        }
+
+        sections_data = {}
         for section in ['writing', 'reading', 'listening', 'speaking']:
-            has_field = getattr(obj, f'has_{section}')
-            score = self.get_score(obj, section) if has_field else None
-            sections[section] = {
-                'has_section': has_field,
-                'already_passed': score is not None and score > 0,
-                'score': score,
+            has_section = getattr(obj, f'has_{section}', False)
+            if has_section:
+                enum_val = getattr(enums.ModuleSectionType, section.upper())
+                user_score = scores_map.get(enum_val, 0)
+                max_score = self.get_section_question_count(obj, section)
+            else:
+                user_score = None
+                max_score = None
+
+            sections_data[section] = {
+                'has_section': has_section,
+                'already_passed': (user_score is not None and user_score > 0),
+                'score': user_score,
+                'max_score': max_score,
             }
-        return sections
+
+        return sections_data
 
     def get_total_score(self, obj):
-        total = 0
+        scores_map = {
+            score_obj.section: score_obj.score
+            for score_obj in obj.modulescore_set.all()
+        }
+
+        total_score_value = 0
+
         for section in ['writing', 'reading', 'listening', 'speaking']:
-            has_field = getattr(obj, f'has_{section}')
-            score = self.get_score(obj, section) if has_field else 0
-            total += score or 0
-        return total
+            if getattr(obj, f'has_{section}', False):
+                enum_val = getattr(enums.ModuleSectionType, section.upper())
+                user_score = scores_map.get(enum_val, 0)
+                total_score_value += user_score
+
+        return {
+            'score': total_score_value,
+            'max_score': self.get_section_question_count(obj, section)
+        }
+
+    def get_section_question_count(self, obj, section):
+        if section == 'reading':
+            return obj.readings.count()
+        elif section == 'listening':
+            return obj.listening_questions.count()
+        elif section == 'speaking':
+            return obj.speakings.count()
+        elif section == 'writing':
+            return 1
+        return 0
 
 
 class ModuleReadingSerializer(serializers.ModelSerializer):
     readings = ReadingQuestionSerializer(many=True)
+    total_questions = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Module
@@ -59,7 +101,11 @@ class ModuleReadingSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'readings',
+            'total_questions',
         )
+
+    def get_total_questions(self, obj):
+        return obj.readings.count()
 
 
 class ModuleWritingSerializer(serializers.ModelSerializer):
@@ -82,6 +128,7 @@ class ModuleWritingSerializer(serializers.ModelSerializer):
 
 class ModuleListeningSerializer(serializers.ModelSerializer):
     listening_questions = ListeningQuestionSerializer(many=True)
+    total_questions = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Module
@@ -89,11 +136,16 @@ class ModuleListeningSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "listening_questions",
+            "total_questions",
         )
+
+    def get_total_questions(self, obj):
+        return obj.listening_questions.count()
 
 
 class ModuleSpeakingSerializer(serializers.ModelSerializer):
     speakings = SpeakingSerializer(many=True)
+    total_questions = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Module
@@ -101,4 +153,8 @@ class ModuleSpeakingSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "speakings",
+            "total_questions",
         )
+
+    def get_total_questions(self, obj):
+        return obj.speakings.count()
