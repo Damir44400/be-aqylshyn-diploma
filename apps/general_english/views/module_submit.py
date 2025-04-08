@@ -1,3 +1,4 @@
+from drf_spectacular import openapi
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
@@ -18,6 +19,7 @@ class ModuleSubmitsView(
         'submit_listening': module_serializers.ModuleOptionSubmitSerializer,
         'submit_speaking': module_serializers.ModuleSpeakingSubmitSerializer,
         'submit_writing': module_serializers.ModuleWritingSubmitSerializer,
+        "get-score": module_serializers.ModuleScoreSerializer
     }
 
     service = module_submit.ModuleSubmitService()
@@ -93,3 +95,16 @@ class ModuleSubmitsView(
             "Writing section submitted successfully",
             enums.ModuleSectionType.WRITING
         )
+
+    @extend_schema(parameters=[
+        openapi.OpenApiParameter(
+            name='section_name',
+            type=openapi.OpenApiTypes.STR,
+            enum=enums.ModuleSectionType.values,
+        )
+    ])
+    @action(detail=False, methods=['get'], url_path='(?P<module_id>\d+)/get-score')
+    def get_score(self, request, module_id):
+        instance = self.service.get_score(request, module_id)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)

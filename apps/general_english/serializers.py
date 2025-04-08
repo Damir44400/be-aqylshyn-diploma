@@ -15,3 +15,4 @@ from .entity_serializers.module import ModuleSpeakingSerializer
 from .entity_serializers.module_submit import ModuleSpeakingSubmitSerializer
 from .entity_serializers.module_submit import ModuleOptionSubmitSerializer
 from .entity_serializers.module_submit import ModuleWritingSubmitSerializer
+from .entity_serializers.module_submit import ModuleScoreSerializer

@@ -1,6 +1,7 @@
 import math
 
 import nltk
+from rest_framework.exceptions import ValidationError
 
 from apps.common import enums as common_enums, enums
 from apps.general_english import models as general_english_models, models
@@ -148,3 +149,22 @@ class ModuleSubmitService:
         )
 
         return float(score)
+
+    def get_score(self, request, module_id):
+        section_name = request.query_params.get('section_name')
+        module = general_english_models.Module.objects.filter(id=module_id).first()
+        if not module:
+            return None
+        module_score = models.ModuleScore.objects.filter(
+            module_id=module_id
+        )
+        if not module_score.exists():
+            raise ValidationError("Module not found")
+
+        module_section_score = module_score.filter(section=section_name).first()
+        if not module_section_score:
+            raise ValidationError("You yet not passed the section")
+        return {
+            "section": section_name,
+            "score": module_section_score.score,
+        }

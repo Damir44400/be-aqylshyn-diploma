@@ -25,3 +25,8 @@ class SpeakingSubmitSerializer(serializers.Serializer):
 
 class ModuleSpeakingSubmitSerializer(serializers.Serializer):
     speaking = SpeakingSubmitSerializer(many=True)
+
+
+class ModuleScoreSerializer(serializers.Serializer):
+    section = serializers.CharField()
+    score = serializers.IntegerField()
