@@ -17,6 +17,7 @@ class ModuleViewSet(
         "writing": general_english_serializers.ModuleWritingSerializer,
         "listening_questions": general_english_serializers.ModuleListeningSerializer,
         "speakings": general_english_serializers.ModuleSpeakingSerializer,
+        "detail": general_english_serializers.ModuleSerializer,
     }
 
     permission_classes = (permissions.IsAuthenticated,)
@@ -47,6 +48,13 @@ class ModuleViewSet(
     @extend_schema(tags=['general-english sections'])
     @action(detail=True, methods=['get'], url_path='speakings')
     def speakings(self, request, pk=None):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    @extend_schema(tags=['general-english sections'])
+    @action(detail=True, methods=['get'], url_path='detail')
+    def detail(self, request, pk=None):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
