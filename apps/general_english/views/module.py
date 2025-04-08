@@ -52,8 +52,7 @@ class ModuleViewSet(
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-    @extend_schema(tags=['general-english sections'])
-    @action(detail=True, methods=['get'], url_path='detail')
+    @action(detail=True, methods=['get'], url_path='details')
     def detail(self, request, pk=None):
         instance = self.get_object()
         serializer = self.get_serializer(instance)

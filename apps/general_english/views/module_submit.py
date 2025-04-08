@@ -19,7 +19,7 @@ class ModuleSubmitsView(
         'submit_listening': module_serializers.ModuleOptionSubmitSerializer,
         'submit_speaking': module_serializers.ModuleSpeakingSubmitSerializer,
         'submit_writing': module_serializers.ModuleWritingSubmitSerializer,
-        "get-score": module_serializers.ModuleScoreSerializer
+        "get_score": module_serializers.ModuleScoreSerializer
     }
 
     service = module_submit.ModuleSubmitService()
