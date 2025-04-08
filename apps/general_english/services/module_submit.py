@@ -99,18 +99,21 @@ class ModuleSubmitService:
 
     def submit_writing_answers(self, data, module_id):
         section = data['section_name']
-
+        print(data)
+        print(section)
         general_english_models.ModuleScore.objects.filter(
             module_id=module_id, section=section
         ).delete()
 
         writing_data = data.get("writing")
+        print("WRITING DATA", writing_data)
         module = (
             general_english_models.Module.objects
             .filter(id=module_id)
             .prefetch_related('writing')
             .first()
         )
+        print("MODULE", module)
         if not module or not module.writing:
             return None
 

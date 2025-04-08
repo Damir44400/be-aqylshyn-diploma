@@ -24,7 +24,7 @@ class SpeakingSubmitSerializer(serializers.Serializer):
 
 
 class ModuleSpeakingSubmitSerializer(serializers.Serializer):
-    speaking = SpeakingSubmitSerializer(many=True)
+    answers = SpeakingSubmitSerializer(many=True)
 
 
 class ModuleScoreSerializer(serializers.Serializer):
