@@ -141,9 +141,10 @@ class ModuleSubmitService:
                 break
             attempt += 1
 
-        module_score = models.ModuleScore.objects.create(
+        models.ModuleScore.objects.create(
             module_id=module_id,
             section=enums.ModuleSectionType.WRITING,
             score=float(score),
         )
-        return module_score
+
+        return float(score)
