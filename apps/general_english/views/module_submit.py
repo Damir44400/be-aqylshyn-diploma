@@ -96,13 +96,16 @@ class ModuleSubmitsView(
             enums.ModuleSectionType.WRITING
         )
 
-    @extend_schema(parameters=[
-        openapi.OpenApiParameter(
-            name='section_name',
-            type=openapi.OpenApiTypes.STR,
-            enum=enums.ModuleSectionType.values,
-        )
-    ])
+    @extend_schema(
+        parameters=[
+            openapi.OpenApiParameter(
+                name='section_name',
+                type=openapi.OpenApiTypes.STR,
+                enum=enums.ModuleSectionType.values,
+            )
+        ],
+        responses=module_serializers.ModuleScoreSerializer
+    )
     @action(detail=False, methods=['get'], url_path='(?P<module_id>\d+)/get-score')
     def get_score(self, request, module_id):
         instance = self.service.get_score(request, module_id)
