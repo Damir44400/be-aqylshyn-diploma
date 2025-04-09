@@ -1,3 +1,5 @@
+from drf_spectacular import openapi
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from apps.courses import models as courses_models
@@ -61,6 +63,7 @@ class CourseGeneralEnglishModuleSerializer(CourseGeneralEnglishRetrieveSerialize
             "modules",
         )
 
+    @extend_schema_field(general_english_serializers.ModuleSerializer(many=True))
     def get_modules(self, obj):
         user = self.context['request'].user
         if hasattr(obj, 'user_course'):
