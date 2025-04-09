@@ -25,6 +25,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "first_name",
+            "profile_picture",
             "last_password",
             "password",
             "password2",
