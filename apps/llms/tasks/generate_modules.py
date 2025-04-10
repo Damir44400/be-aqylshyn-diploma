@@ -2,7 +2,6 @@ import logging
 import uuid
 
 from celery import shared_task
-from django.core.files.base import ContentFile
 from django.db import transaction
 
 from apps.common.utils import get_image_url
@@ -14,6 +13,7 @@ from apps.llms.prompts.reading_generate_prompt import get_reading_prompt
 from apps.llms.prompts.speaking_generate_prompt import get_speaking_prompt
 from apps.llms.prompts.writing_generate_prompt import get_writing_prompt
 from apps.llms.tasks import parse_json_response
+from core.settings import MEDIA_ROOT
 
 logger = logging.getLogger(__name__)
 MAX_ATTEMPT = 3
@@ -165,15 +165,15 @@ def _create_listening_for_module(created_module, user_level):
                 continue
 
             unique_filename = f"{uuid.uuid4()}.wav"
-
-            audio_file = ContentFile(voice_bytes, name=unique_filename)
+            path = MEDIA_ROOT / unique_filename
+            with open(path, "wb") as f:
+                f.write(voice_bytes)
 
             listening_question_obj = general_english_models.ListeningQuestion.objects.create(
                 context=context,
-                module_id=created_module.pk
+                module_id=created_module.pk,
+                audio_question=path
             )
-
-            listening_question_obj.audio_question.save(unique_filename, audio_file)
 
             options_data = question_data.get('options', [])
             for option_data in options_data:
