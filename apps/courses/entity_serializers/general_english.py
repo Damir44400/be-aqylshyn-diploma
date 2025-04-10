@@ -1,9 +1,10 @@
-from drf_spectacular import openapi
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
+from apps.common import enums
 from apps.courses import models as courses_models
 from apps.courses import serializers as course_serializers
+from apps.general_english import models as general_english_models
 from apps.general_english import serializers as general_english_serializers
 
 
@@ -70,5 +71,25 @@ class CourseGeneralEnglishModuleSerializer(CourseGeneralEnglishRetrieveSerialize
             user_course = obj.user_course.filter(user=user).first()
             if user_course:
                 modules_qs = user_course.user_modules.all()
+                for module in modules_qs:
+                    if module.is_completed:
+                        continue
+                    completed_sections = set(general_english_models.ModuleScore.objects.filter(
+                        module=module
+                    ).values_list('section', flat=True).distinct())
+
+                    required_sections = {
+                        enums.ModuleSectionType.WRITING,
+                        enums.ModuleSectionType.READING,
+                        enums.ModuleSectionType.SPEAKING,
+                        enums.ModuleSectionType.LISTENING,
+                    }
+                    is_complete = required_sections.issubset(completed_sections)
+                    print(f"Module complete: {is_complete}")
+
+                    if is_complete != module.is_completed:
+                        module.is_completed = is_complete
+                        module.save(update_fields=['is_completed'])
+                        print(f"Updated module {module.id} completion to {is_complete}")
                 return general_english_serializers.ModuleSerializer(modules_qs, many=True).data
         return None
