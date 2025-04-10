@@ -8,10 +8,11 @@ from apps.general_english import models
 @receiver(post_save, sender=models.ModuleScore)
 def check_module_completion(sender, instance, created, **kwargs):
     module = instance.module
+    print(f"Signal triggered for ModuleScore {instance.id} of module {module.id}")
 
-    completed_sections = models.ModuleScore.objects.filter(
+    completed_sections = set(models.ModuleScore.objects.filter(
         module=module
-    ).values_list('section', flat=True)
+    ).values_list('section', flat=True).distinct())
 
     required_sections = {
         enums.ModuleSectionType.WRITING,
@@ -20,14 +21,23 @@ def check_module_completion(sender, instance, created, **kwargs):
         enums.ModuleSectionType.LISTENING,
     }
 
-    if required_sections.issubset(set(completed_sections)):
-        module.is_completed = True
-        module.save()
+    print(f"Completed: {completed_sections}")
+    print(f"Required: {required_sections}")
 
-    user_progress = models.UserProgress.objects.filter(
-        user=module.user_course.user
-    ).first()
+    is_complete = required_sections.issubset(completed_sections)
+    print(f"Module complete: {is_complete}")
 
-    if user_progress:
-        user_progress.last_module = module
-        user_progress.save()
+    if is_complete != module.is_completed:
+        module.is_completed = is_complete
+        module.save(update_fields=['is_completed'])
+        print(f"Updated module {module.id} completion to {is_complete}")
+    try:
+        user_progress = models.UserProgress.objects.get(
+            user=module.user_course.user
+        )
+        if user_progress.last_module != module:
+            user_progress.last_module = module
+            user_progress.save(update_fields=['last_module'])
+            print(f"Updated last module for user {module.user_course.user.id}")
+    except models.UserProgress.DoesNotExist:
+        print(f"No UserProgress found for user {module.user_course.user.id}")

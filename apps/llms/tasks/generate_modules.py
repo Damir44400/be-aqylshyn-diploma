@@ -157,24 +157,35 @@ def _create_listening_for_module(created_module, user_level):
 
     for question_data in listening_questions:
         context = question_data.get('context', '')
-        voice = elevenlab.send_request(context)
-        audio_file = ContentFile(voice)
+        try:
+            voice_bytes = elevenlab.send_request(context)
 
-        unique_filename = f"{uuid.uuid4()}.wav"
-        listening_question_obj = general_english_models.ListeningQuestion.objects.create(
-            context=context,
-            module_id=created_module.pk
-        )
+            if not isinstance(voice_bytes, bytes):
+                logger.error(f"Expected bytes from ElevenLabs, got {type(voice_bytes)}")
+                continue
 
-        listening_question_obj.audio_question.save(unique_filename, audio_file)
+            unique_filename = f"{uuid.uuid4()}.wav"
 
-        options_data = question_data.get('options', [])
-        for option_data in options_data:
-            general_english_models.ListeningOption.objects.create(
-                question=listening_question_obj,
-                option=option_data.get('option', ''),
-                is_correct=option_data.get('is_correct', False)
+            audio_file = ContentFile(voice_bytes, name=unique_filename)
+
+            listening_question_obj = general_english_models.ListeningQuestion.objects.create(
+                context=context,
+                module_id=created_module.pk
             )
+
+            listening_question_obj.audio_question.save(unique_filename, audio_file)
+
+            options_data = question_data.get('options', [])
+            for option_data in options_data:
+                general_english_models.ListeningOption.objects.create(
+                    question=listening_question_obj,
+                    option=option_data.get('option', ''),
+                    is_correct=option_data.get('is_correct', False)
+                )
+
+        except Exception as e:
+            logger.error(f"Failed to process listening question: {str(e)}")
+            continue
 
 
 def _create_speaking_for_module(created_module, user_level):
