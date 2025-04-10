@@ -80,7 +80,7 @@ services:
   celery-worker:
     build: .
     restart: always
-    command: [ "celery", "-A", "core", "worker", "--loglevel=warning", "--concurrency=1" ]
+    command: [ "celery", "-A", "core", "worker", "--loglevel=warning"]
     depends_on:
       redis-aqylshyn:
         condition: service_healthy
