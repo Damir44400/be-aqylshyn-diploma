@@ -204,8 +204,7 @@ class ModuleSubmitService:
                 response_text = response.text if hasattr(response, 'text') else response
 
                 parsed_response = parse_json_response(response_text)
-                score = parsed_response.get('score')
-
+                score = parsed_response.get('writing').get('score')
                 if score is not None:
                     try:
                         final_score = float(score)
