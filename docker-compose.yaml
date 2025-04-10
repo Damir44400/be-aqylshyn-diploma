@@ -1,10 +1,12 @@
 version: '3.8'
 
+x-build: &default-build
+  context: .
+  dockerfile: ./Dockerfile
+
 services:
   be-aqylshyn:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+    build: *default-build
     restart: always
     depends_on:
       db-aqylshyn:
@@ -39,7 +41,7 @@ services:
           memory: 300M
           cpus: "0.3"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER" ]
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -53,22 +55,21 @@ services:
     restart: always
     networks:
       - network-aqylshyn
-    command: redis-server --save "" --appendonly no --maxmemory 50mb
     deploy:
       resources:
         limits:
           memory: 100M
           cpus: "0.2"
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 3
 
   celery-beat:
-    build: .
+    build: *default-build
     restart: always
-    command: [ "celery", "-A", "core", "beat", "--loglevel=warning" ]
+    command: ["celery", "-A", "core", "beat", "--loglevel=warning"]
     depends_on:
       redis-aqylshyn:
         condition: service_healthy
@@ -76,11 +77,13 @@ services:
         condition: service_healthy
     networks:
       - network-aqylshyn
+    volumes:
+      - media:/app/media  # ✅ add media access
 
   celery-worker:
-    build: .
+    build: *default-build
     restart: always
-    command: [ "celery", "-A", "core", "worker", "--loglevel=warning"]
+    command: ["celery", "-A", "core", "worker", "--loglevel=warning"]
     depends_on:
       redis-aqylshyn:
         condition: service_healthy
@@ -88,10 +91,12 @@ services:
         condition: service_healthy
     networks:
       - network-aqylshyn
+    volumes:
+      - media:/app/media  # ✅ add media access
 
 volumes:
-  pg_data: { }
-  media: { }
+  pg_data: {}
+  media: {}
 
 networks:
-  network-aqylshyn: { }
+  network-aqylshyn: {}

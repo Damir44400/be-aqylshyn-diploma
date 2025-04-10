@@ -156,7 +156,8 @@ def _create_listening_for_module(created_module, user_level):
             logger.error(f"Failed to create listening for module {created_module.name}.")
             return
         attempt += 1
-
+    listening_dir = os.path.join(MEDIA_ROOT, "listening")
+    os.makedirs(listening_dir, exist_ok=True)
     for question_data in listening_questions:
         context = question_data.get('context', '')
         try:
@@ -166,16 +167,18 @@ def _create_listening_for_module(created_module, user_level):
                 logger.error(f"Expected bytes from ElevenLabs, got {type(voice_bytes)}")
                 continue
 
-            unique_filename = f"{uuid.uuid4()}.wav"
-            path = os.path.join(MEDIA_ROOT, unique_filename)
+            unique_filename = f"{uuid.uuid4()}.mp3"
+            path = os.path.join(listening_dir, unique_filename)
 
             with open(path, "wb") as f:
                 f.write(voice_bytes)
+            print(voice_bytes)
+            logger.info(f"Audio saved at: {path}")
 
             listening_question_obj = general_english_models.ListeningQuestion.objects.create(
                 context=context,
                 module_id=created_module.pk,
-                audio_question=path
+                audio_question=f"listening/{unique_filename}",
             )
 
             options_data = question_data.get('options', [])
