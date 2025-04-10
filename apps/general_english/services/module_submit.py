@@ -7,7 +7,6 @@ from apps.llms import openai_cli
 from apps.llms.prompts.essay_checker_prompt import get_essay_checker_prompt
 from apps.llms.tasks import parse_json_response
 
-MAX_ATTEMPTS = 3
 
 
 class ModuleSubmitService:
@@ -99,34 +98,23 @@ class ModuleSubmitService:
 
     def submit_writing_answers(self, data, module_id):
         section = data['section_name']
-        print(data)
-        print(section)
         general_english_models.ModuleScore.objects.filter(
             module_id=module_id, section=section
         ).delete()
-
         writing_data = data.get("writing")
-        print("WRITING DATA", writing_data)
-        module = (
-            general_english_models.Module.objects
-            .filter(id=module_id)
-            .prefetch_related('writing')
-            .first()
-        )
-        print("MODULE", module)
-        if not module or not module.writing:
+        writing = general_english_models.Writing.objects.filter(module_id=module_id).first()
+        if not writing:
             return None
-
-        db_writing = module.writing.first()
 
         prompt = get_essay_checker_prompt()
 
         score = None
-        for _attempt in range(MAX_ATTEMPTS):
+        for _attempt in range(3):
             response = openai_cli.OpenAICLI().send_request(
                 system_prompt=prompt,
-                data=f"requirements: {db_writing.requirements}\nuser answer: {writing_data}"
+                data=f"requirements: {writing.requirements}\nuser answer: {writing_data}"
             )
+            print("Text",response)
             response_text = getattr(response, 'text', response)
 
             try:
