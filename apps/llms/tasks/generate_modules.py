@@ -1,4 +1,5 @@
 import logging
+import os
 import uuid
 
 from celery import shared_task
@@ -165,7 +166,8 @@ def _create_listening_for_module(created_module, user_level):
                 continue
 
             unique_filename = f"{uuid.uuid4()}.wav"
-            path = MEDIA_ROOT / unique_filename
+            path = os.path.join(MEDIA_ROOT, unique_filename)
+
             with open(path, "wb") as f:
                 f.write(voice_bytes)
 
