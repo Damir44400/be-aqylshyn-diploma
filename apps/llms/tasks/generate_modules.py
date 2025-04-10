@@ -18,6 +18,7 @@ from core.settings import MEDIA_ROOT
 
 logger = logging.getLogger(__name__)
 MAX_ATTEMPT = 3
+os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 
 def _create_reading_for_module(created_module, user_level):
