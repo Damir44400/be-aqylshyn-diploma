@@ -25,14 +25,22 @@ class ModuleSubmitsView(
     service = module_submit.ModuleSubmitService()
     permission_classes = [permissions.IsAuthenticated]
 
-    def _handle_module_submission(self, request, module_id, submit_method, success_message, type):
+    def _handle_module_submission(
+            self,
+            request,
+            module_id,
+            submit_method,
+            success_message,
+            type
+    ):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        print(serializer)
         try:
             data = serializer.validated_data
             data['section_name'] = type
+            print(data)
             result = submit_method(
                 data=data,
                 module_id=module_id
