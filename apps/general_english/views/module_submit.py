@@ -83,11 +83,6 @@ class ModuleSubmitsView(
             return Response({
                 "error": str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            # Log the exception here
-            return Response({
-                "error": "An unexpected error occurred during submission"
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @extend_schema(
         description="Submit answers for the reading section of a module",

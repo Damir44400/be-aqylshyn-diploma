@@ -173,10 +173,12 @@ class ModuleSubmitService:
         ).delete()
 
         writing_data = data.get("writing")
+        print(writing_data)
         if not writing_data:
             raise ValidationError("No writing submission provided")
 
         writing = general_english_models.Writing.objects.filter(module_id=module_id).first()
+        print(writing)
         if not writing:
             raise ValidationError("No writing exercise found for this module")
 
