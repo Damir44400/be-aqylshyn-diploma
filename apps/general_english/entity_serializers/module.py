@@ -45,7 +45,7 @@ class ModuleSerializer(serializers.ModelSerializer):
             has_section = getattr(obj, f'has_{section}', False)
             if has_section:
                 enum_val = getattr(enums.ModuleSectionType, section.upper())
-                user_score = scores_map.get(enum_val, 0)
+                user_score = scores_map.get(enum_val, None)
                 max_score = self.get_section_question_count(obj, section)
             else:
                 user_score = None
@@ -53,7 +53,7 @@ class ModuleSerializer(serializers.ModelSerializer):
 
             sections_data[section] = {
                 'has_section': has_section,
-                'already_passed': (user_score is not None),
+                'already_passed': user_score is not None,
                 'score': user_score,
                 'max_score': max_score,
             }
