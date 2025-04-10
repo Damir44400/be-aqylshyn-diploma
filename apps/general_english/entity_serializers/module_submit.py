@@ -10,12 +10,8 @@ class ModuleOptionSubmitSerializer(serializers.Serializer):
     options = OptionSubmitSerializer(many=True)
 
 
-class WritingSubmitSerializer(serializers.Serializer):
-    text = serializers.CharField()
-
-
 class ModuleWritingSubmitSerializer(serializers.Serializer):
-    writing = WritingSubmitSerializer(many=False)
+    writing = serializers.CharField()
 
 
 class SpeakingSubmitSerializer(serializers.Serializer):

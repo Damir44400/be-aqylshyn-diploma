@@ -34,6 +34,7 @@ class ModuleSubmitsView(
             type
     ):
         serializer = self.get_serializer(data=request.data)
+        print(serializer)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         print(serializer)
@@ -96,6 +97,7 @@ class ModuleSubmitsView(
 
     @action(detail=False, methods=['post'], url_path='(?P<module_id>\d+)/writing')
     def submit_writing(self, request, module_id):
+        print(request.data)
         return self._handle_module_submission(
             request,
             module_id,
