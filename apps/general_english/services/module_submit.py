@@ -41,7 +41,7 @@ class ModuleSubmitService:
 
         module_questions = self._get_module_questions(module_id, section)
         if not module_questions:
-            return 0
+            raise ValidationError("No module questions found")
 
         for option in data.get('options', []):
             question_id = option.get('question_id')
@@ -77,7 +77,7 @@ class ModuleSubmitService:
 
         db_speakings = general_english_models.Speaking.objects.filter(module_id=module_id)
         if not db_speakings:
-            return 0
+            raise ValidationError("No speaking for this module")
 
         for answer in data.get("answers", []):
             speaking_id = answer.get('speaking_id')
@@ -115,7 +115,7 @@ class ModuleSubmitService:
                 data=f"requirements: {writing.requirements}\nuser answer: {writing_data}"
             )
             print("Text",response)
-            response_text = getattr(response, 'text', response)
+            response_text = response.text if hasattr(response, 'text') else response
 
             try:
                 parsed_response = parse_json_response(response_text)
