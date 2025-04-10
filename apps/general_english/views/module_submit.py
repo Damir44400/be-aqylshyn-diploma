@@ -97,7 +97,8 @@ class ModuleSubmitsView(
 
     @action(detail=False, methods=['post'], url_path='(?P<module_id>\d+)/writing')
     def submit_writing(self, request, module_id):
-        print(request.data)
+        print("MODULE ID", module_id)
+        print("REQUEST DATA" , request.data)
         return self._handle_module_submission(
             request,
             module_id,
