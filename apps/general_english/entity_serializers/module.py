@@ -53,7 +53,7 @@ class ModuleSerializer(serializers.ModelSerializer):
 
             sections_data[section] = {
                 'has_section': has_section,
-                'already_passed': (user_score is not None and user_score > 0),
+                'already_passed': (user_score is not None),
                 'score': user_score,
                 'max_score': max_score,
             }
