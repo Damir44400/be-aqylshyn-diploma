@@ -17,16 +17,9 @@ class IeltsViewSet(
     queryset = ielts_models.IeltsModule.objects.all()
     serializers = {
         "list": ielts_serializers.IeltsModuleSerializer,
-        "list_submodules": ielts_serializers.IeltsModuleDetailSerializer,
         "test_detail": ielts_serializers.IeltsTestDetailSerializer,
     }
 
-    @action(detail=True, methods=["get"], url_path="submodules")
-    def list_submodules(self, request, pk=None):
-        module = self.get_object()
-        submodules = module.sub_modules.all()
-        serializer = ielts_serializers.IeltsSubModuleDetailSerializer(submodules, many=True)
-        return Response(serializer.data)
 
     @extend_schema(
         responses=ielts_serializers.IeltsTestDetailSerializer,
@@ -131,9 +124,9 @@ class IeltsViewSet(
             )
         ]
     )
-    @action(detail=True, methods=["get"], url_path="submodules/(?P<submodule_id>[^/.]+)/tests/(?P<test_id>[^/.]+)")
-    def test_detail(self, request, pk=None, submodule_id=None, test_id=None):
-        test = ielts_models.IeltsTest.objects.filter(pk=test_id, sub_model_id=submodule_id).first()
+    @action(detail=False, methods=["get"], url_path="test/(?P<test_id>[^/.]+)")
+    def test_detail(self, request, test_id):
+        test = ielts_models.IeltsTest.objects.filter(pk=test_id).first()
         if not test:
             raise ValidationError("Test not found")
         serializer = self.get_serializer(test)

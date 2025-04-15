@@ -27,10 +27,10 @@ class DifficultyType(models.TextChoices):
 
 class IeltsReadingQuestionType(models.TextChoices):
     FILL_BLANK = 'FILL', _('Fill in the Blank')
-    SELECT_INSERT_ANSWER = 'SELECT_INSERT_ANSWER', _('Select and place in correct order')
-    OPTIONS = 'OPTIONS', _('Multiple Choice Options')
+    SELECT_INSERT = 'SELECT_INSERT', _('Select and place in correct order')
+    OPTIONS = 'OPTIONS', _('Choice Options')
 
 
 class IeltsListeningQuestionType(models.TextChoices):
     FILL_BLANK = 'FILL', _('Fill in the Blank')
-    OPTIONS = 'OPTIONS', _('Multiple Choice Options')
+    OPTIONS = 'OPTIONS', _('Choice Options')

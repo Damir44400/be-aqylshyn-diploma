@@ -21,7 +21,7 @@ class ReadingQuestionSerializer(serializers.ModelSerializer):
         if obj.question_type == enums.IeltsReadingQuestionType.OPTIONS:
             return ReadingOptionsSerializer(obj.options.all(), many=True).data
 
-        elif obj.question_type == enums.IeltsReadingQuestionType.SELECT_INSERT_ANSWER:
-            return ReadingSelectInsertSerializer(obj.select_insert_data, many=False).data
+        elif obj.question_type == "SELECT_INSERT":
+            return ReadingSelectInsertSerializer(obj.select_insert_data).data
 
         return []
