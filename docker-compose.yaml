@@ -9,10 +9,8 @@ services:
     build: *default-build
     restart: always
     depends_on:
-      db-aqylshyn:
-        condition: service_healthy
-      redis-aqylshyn:
-        condition: service_healthy
+      - db-aqylshyn
+      - redis-aqylshyn
     env_file:
       - .env
     networks:
@@ -32,19 +30,6 @@ services:
       - network-aqylshyn
     env_file:
       - .env
-    environment:
-      POSTGRES_SHARED_BUFFERS: "64MB"
-      POSTGRES_WORK_MEM: "4MB"
-    deploy:
-      resources:
-        limits:
-          memory: 300M
-          cpus: "0.3"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     logging:
       driver: "none"
     ports:
@@ -56,41 +41,30 @@ services:
     networks:
       - network-aqylshyn
     container_name: redis-aqylshyn
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
-      timeout: 3s
-      retries: 5
 
   celery-beat:
     build: *default-build
     restart: always
     command: ["celery", "-A", "core", "beat", "--loglevel=warning"]
     depends_on:
-      redis-aqylshyn:
-        condition: service_healthy
-      be-aqylshyn:
-        condition: service_healthy
+      - redis-aqylshyn
+      - be-aqylshyn
     networks:
       - network-aqylshyn
     volumes:
-      - media:/app/media  # ✅ add media access
+      - media:/app/media
 
   celery-worker:
     build: *default-build
     restart: always
     command: ["celery", "-A", "core", "worker", "--loglevel=warning"]
     depends_on:
-      redis-aqylshyn:
-        condition: service_healthy
-      be-aqylshyn:
-        condition: service_healthy
+      - redis-aqylshyn
+      - be-aqylshyn
     networks:
       - network-aqylshyn
     volumes:
-      - media:/app/media  # ✅ add media access
+      - media:/app/media
 
 volumes:
   pg_data: {}
