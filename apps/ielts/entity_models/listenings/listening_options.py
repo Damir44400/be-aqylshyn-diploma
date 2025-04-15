@@ -22,6 +22,9 @@ class IeltsListeningOption(models.Model):
     def __str__(self):
         return f"{self.option} ({'Correct' if self.is_correct else 'Incorrect'})"
 
+    class Meta:
+        verbose_name_plural = "Listening | Options"
+
 
 class IeltsListeningFillBlank(models.Model):
     question = models.OneToOneField(
@@ -37,3 +40,7 @@ class IeltsListeningFillBlank(models.Model):
 
     def __str__(self):
         return f"FillBlank for Question #{self.question.id}"
+
+
+    class Meta:
+        verbose_name_plural = "Listening | Fill-in-the-blanks"

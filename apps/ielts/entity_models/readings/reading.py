@@ -10,8 +10,7 @@ class IeltsReading(common_models.BaseModel):
     test = models.ForeignKey(IeltsTest, on_delete=models.CASCADE, related_name='readings')
 
     class Meta:
-        verbose_name = 'Оқу мәтіні'
-        verbose_name_plural = 'Оқу мәтіндері'
+        verbose_name_plural = "Reading | Passages"
 
     def __str__(self):
         return self.title

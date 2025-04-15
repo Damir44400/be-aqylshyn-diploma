@@ -13,6 +13,9 @@ class IeltsWriting(BaseModel):
     def __str__(self):
         return self.title
 
+    class Meta:
+        verbose_name_plural = "Writing | Tasks"
+
 
 class WritingImage(models.Model):
     question = models.ForeignKey(
@@ -25,3 +28,6 @@ class WritingImage(models.Model):
 
     def __str__(self):
         return f"Image for Question {self.question.id}"
+
+    class Meta:
+        verbose_name_plural = "Writing | Images"

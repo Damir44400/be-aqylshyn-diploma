@@ -23,8 +23,7 @@ class IeltsSubModule(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Оқу тапсырмасы'
-        verbose_name_plural = 'Оқу тапсырмалары'
+        verbose_name_plural = "Admin | IELTS SubModules"
 
     def __str__(self):
         return f"{self.title} - {self.get_difficulty_display()}"

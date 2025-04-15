@@ -1,12 +1,8 @@
 from rest_framework.routers import DefaultRouter
 
-from apps.ielts.views import ielts_module
-from apps.ielts.views import ielts_sub_module
-from apps.ielts.views import ielts_test
+from apps.ielts import views
 
 router = DefaultRouter()
-router.register("modules", ielts_module.IeltsView, basename="module")
-router.register("submodules", ielts_sub_module.IeltsSubModuleView, basename="module-sub-module")
-router.register("tests", ielts_test.IeltsTestViewSet, basename="module-sub-module-test")
+router.register("modules", views.IeltsViewSet, basename="ielts")
 
 urlpatterns = router.urls

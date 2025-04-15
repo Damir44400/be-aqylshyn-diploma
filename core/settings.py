@@ -81,6 +81,7 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 DJANGO_APPS = [
     'jazzmin',
+    'nested_admin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -100,7 +101,6 @@ LOCAL_APPS = [
 THIRD_PARTY_APPS = [
     'drf_spectacular',
     'corsheaders',
-    'nested_admin',
     "fcm_django",
     'rest_framework',
 ]

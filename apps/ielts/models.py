@@ -13,7 +13,7 @@ from .entity_models.readings.reading_options import IeltsReadingOption
 from .entity_models.readings.reading_options import IeltsReadingSelectInsert
 from .entity_models.readings.reading_question import IeltsReadingQuestion
 
-__all__ = [
+admin_models = [
     IeltsModule,
     IeltsReading,
     IeltsReadingQuestion,

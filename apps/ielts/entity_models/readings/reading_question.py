@@ -23,3 +23,7 @@ class IeltsReadingQuestion(BaseModel):
 
     def __str__(self):
         return f"Question #{self.id} - {self.get_question_type_display()}"
+
+    class Meta:
+        verbose_name = "Оқылым сұрағы"
+        verbose_name_plural = "Reading | Questions"

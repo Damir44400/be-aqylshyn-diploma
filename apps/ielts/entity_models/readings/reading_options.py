@@ -1,5 +1,4 @@
 from django.db import models
-
 from .reading_question import IeltsReadingQuestion
 
 
@@ -22,6 +21,9 @@ class IeltsReadingOption(models.Model):
     def __str__(self):
         return f"{self.option} ({'Correct' if self.is_correct else 'Incorrect'})"
 
+    class Meta:
+        verbose_name_plural = "Reading | Options"
+
 
 class IeltsReadingFillBlank(models.Model):
     question = models.OneToOneField(
@@ -37,6 +39,9 @@ class IeltsReadingFillBlank(models.Model):
 
     def __str__(self):
         return f"FillBlank for Question #{self.question.id}"
+
+    class Meta:
+        verbose_name_plural = "Reading | Fill-in-the-blanks"
 
 
 class IeltsReadingSelectInsert(models.Model):
@@ -59,3 +64,7 @@ class IeltsReadingSelectInsert(models.Model):
 
     def __str__(self):
         return f"SelectInsert for Question #{self.question.id}"
+
+    class Meta:
+        verbose_name_plural = "Reading | Select Insert"
+

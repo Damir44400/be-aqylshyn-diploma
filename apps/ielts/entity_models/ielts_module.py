@@ -19,8 +19,7 @@ class IeltsModule(common_models.BaseModel, models.Model):
     )
 
     class Meta:
-        verbose_name = 'IELTS модулі'
-        verbose_name_plural = 'IELTS модульдері'
+        verbose_name_plural = "Admin | IELTS Modules"
 
     def __str__(self):
         return self.title
