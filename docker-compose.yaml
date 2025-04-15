@@ -55,7 +55,7 @@ services:
     restart: always
     networks:
       - network-aqylshyn
-
+    container_name: redis-aqylshyn
     ports:
       - "6379:6379"
 
