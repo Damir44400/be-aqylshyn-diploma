@@ -58,6 +58,11 @@ services:
     container_name: redis-aqylshyn
     ports:
       - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
   celery-beat:
     build: *default-build
