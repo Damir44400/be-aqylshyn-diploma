@@ -48,11 +48,35 @@ class DurationSerializer(serializers.ModelSerializer):
 
 
 class UniversityListSerializer(serializers.ModelSerializer):
-    location = LocationSerializer()
+    location = serializers.SerializerMethodField()
+    duration = serializers.SerializerMethodField()
+    languages = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
 
     class Meta:
         model = University
-        fields = ('id', 'name', 'website', 'location')
+        fields = (
+            'id',
+            'name',
+            "image",
+            'duration',
+            'pace',
+            'location',
+            'languages',
+            'description',
+        )
+
+    def get_location(self, obj):
+        return obj.location.name if obj.location else None
+
+    def get_duration(self, obj):
+        return f"{obj.duration.duration} {obj.duration.prefix}" if obj.duration else None
+
+    def get_languages(self, obj):
+        return [language.name for language in obj.languages.all()]
+
+    def get_description(self, obj):
+        return obj.key_summary[:50] if obj.key_summary else None
 
 
 class UniversityDetailSerializer(serializers.ModelSerializer):

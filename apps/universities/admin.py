@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import (
     FieldsOfStudy,
     Location,
@@ -8,6 +9,7 @@ from .models import (
     Duration,
     University,
 )
+
 
 @admin.register(FieldsOfStudy)
 class FieldsOfStudyAdmin(admin.ModelAdmin):
@@ -47,7 +49,7 @@ class DurationAdmin(admin.ModelAdmin):
 
 @admin.register(University)
 class UniversityAdmin(admin.ModelAdmin):
-    list_display = ('name', 'website', 'location', 'degree_type')
-    search_fields = ('name', 'website')
+    list_display = ('name', 'location', 'degree_type')
+    search_fields = ('name',)
     list_filter = ('location', 'degree_type', 'languages')
     filter_horizontal = ('languages', 'study_formats', 'fields_of_study',)

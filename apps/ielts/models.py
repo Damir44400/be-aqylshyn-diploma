@@ -1,8 +1,9 @@
+from apps.ielts.entity_models.ielts_writing import IeltsWriting
+from apps.ielts.entity_models.ielts_writing import WritingImage
 from .entity_models.ielts_module import IeltsModule
 from .entity_models.ielts_sub_module import IeltsSubModule
 from .entity_models.ielts_test import IeltsTest
-from apps.ielts.entity_models.ielts_writing import IeltsWriting
-from apps.ielts.entity_models.ielts_writing import WritingImage
+from .entity_models.ielts_test_submit import IeltsTestSubmit
 from .entity_models.listenings.listening import IeltsListening
 from .entity_models.listenings.listening_options import IeltsListeningFillBlank
 from .entity_models.listenings.listening_options import IeltsListeningOption
@@ -28,4 +29,5 @@ admin_models = [
     IeltsWriting,
     WritingImage,
     IeltsTest,
+    IeltsTestSubmit
 ]

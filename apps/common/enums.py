@@ -34,3 +34,7 @@ class IeltsReadingQuestionType(models.TextChoices):
 class IeltsListeningQuestionType(models.TextChoices):
     FILL_BLANK = 'FILL', _('Fill in the Blank')
     OPTIONS = 'OPTIONS', _('Choice Options')
+
+class ChatSenderType(models.TextChoices):
+    USER = "USER", _("User")
+    AI = "AI", _("AI")

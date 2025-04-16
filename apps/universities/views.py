@@ -1,7 +1,9 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from .filters import UniversityFilter
 from .models import (
     University,
     Location,
@@ -26,7 +28,9 @@ class UniversityViewSet(
     ActionSerializerMixin,
     viewsets.ReadOnlyModelViewSet
 ):
-    queryset = University.objects.all()
+    queryset = University.objects.all().prefetch_related(
+        "languages", "study_formats", "fields_of_study"
+    ).select_related("duration", "location", "degree_type")
     serializers = {
         'list': UniversityListSerializer,
         'retrieve': UniversityDetailSerializer,
@@ -36,6 +40,8 @@ class UniversityViewSet(
         "degree_types": DegreeTypeSerializer,
         "fields_of_study": FieldsOfStudySerializer,
     }
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = UniversityFilter
 
     @action(detail=False, methods=['get'], url_path='locations')
     def locations(self, request, *args, **kwargs):

@@ -20,7 +20,6 @@ class IeltsViewSet(
         "test_detail": ielts_serializers.IeltsTestDetailSerializer,
     }
 
-
     @extend_schema(
         responses=ielts_serializers.IeltsTestDetailSerializer,
         examples=[
@@ -131,3 +130,15 @@ class IeltsViewSet(
             raise ValidationError("Test not found")
         serializer = self.get_serializer(test)
         return Response(serializer.data)
+
+
+class IeltsTestSubmitViewSet(
+    common_mixins.ActionSerializerMixin,
+    viewsets.GenericViewSet,
+):
+    serializers = {
+        "fill_blank_submit": ielts_serializers.IeltsFillBlankSubmit,
+        "select_insert_submit": ielts_serializers.IeltsSelectInsertSubmit,
+        "writing_submit": ielts_serializers.IeltsWritingSubmit,
+        "options_submit": ielts_serializers.IeltsOptionsSubmit
+    }

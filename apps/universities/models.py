@@ -66,7 +66,7 @@ class Duration(models.Model):
 
 class University(models.Model):
     name = models.CharField("Аты", max_length=100)
-    website = models.URLField("Сайт", blank=True, null=True)
+    image = models.ImageField("Университет суреты", upload_to="university_images/", blank=True, null=True)
     about = models.TextField("Университет туралы", blank=True, null=True)
     logo = models.ImageField("Логотип", upload_to='university_logos/', blank=True, null=True)
 
@@ -86,6 +86,9 @@ class University(models.Model):
     introduction = models.TextField("Кіріспе", blank=True, null=True)
     academic_requirements = models.TextField("Академиялық талаптар", blank=True, null=True)
     scholarships_funding = models.TextField("Стипендия және қаржыландыру", blank=True, null=True)
+    tuition_fees = models.CharField(null=True)
+    pace = models.CharField(default="Full Time")
+    application_deadline = models.CharField(null=True)
 
     def __str__(self):
         return self.name
