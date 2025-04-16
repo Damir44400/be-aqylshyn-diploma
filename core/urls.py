@@ -13,6 +13,7 @@ urlpatterns = [
     path('auth/', include('apps.auths.urls')),
     path('users/', include('apps.users.urls')),
     path('universities/', include('apps.universities.urls')),
+    path('chats/', include('apps.ai_chat.urls')),
     path('i18n/', include('django.conf.urls.i18n')),
 ]
 

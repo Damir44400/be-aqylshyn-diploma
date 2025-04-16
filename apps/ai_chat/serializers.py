@@ -20,3 +20,20 @@ class ChatMessageSerializer(serializers.ModelSerializer):
             "text",
             "sender"
         )
+
+
+class ChatDetailSerializer(serializers.ModelSerializer):
+    messages = ChatMessageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.Chats
+        fields = (
+            "id",
+            "name",
+            "messages"
+        )
+
+
+class MessageSerializer(serializers.Serializer):
+    message = serializers.CharField()
+    chat_id = serializers.IntegerField(required=False)
