@@ -16,6 +16,8 @@ class IeltsReadingSerializer(serializers.ModelSerializer):
             "title",
             "content",
             "questions",
+            "is_passed",
+            "score",
         )
 
     def get_is_passed(self, obj):
