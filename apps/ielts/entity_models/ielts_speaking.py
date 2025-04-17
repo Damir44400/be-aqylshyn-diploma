@@ -7,7 +7,7 @@ class IeltsSpeakingQuestion(models.Model):
     question = models.TextField()
     additional_information = models.TextField()
 
-    test = models.ForeignKey(IeltsTest, on_delete=models.CASCADE, related_name='speaking_questions')
+    test = models.ForeignKey(IeltsTest, on_delete=models.CASCADE, related_name='speakings')
 
     def __str__(self):
         return self.test

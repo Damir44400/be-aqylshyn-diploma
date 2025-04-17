@@ -29,11 +29,11 @@ class ChatViewSet(common_mixins.ActionSerializerMixin, viewsets.GenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         answer = self.service.send_message(serializer.validated_data, user=request.user)
-        return Response({"answer": answer}, status=status.HTTP_200_OK)
+        return Response({"answer": answer[0], "chat_id": answer[1]}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"], url_path="history")
     def chat_history(self, request, pk=None):
-        queryset = Chats.objects.filter(user=request.user,id=pk).first()
+        queryset = Chats.objects.filter(user=request.user, id=pk).first()
         if not queryset:
             raise ValidationError("Chat not found")
         serializer = self.get_serializer(queryset, many=False)

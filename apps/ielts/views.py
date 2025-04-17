@@ -141,43 +141,38 @@ class IeltsTestSubmitViewSet(
     permission_classes = [permissions.IsAuthenticated]
 
     serializers = {
-        "fill_blank_submit": ielts_serializers.IeltsFillBlankSubmit,
-        "select_insert_submit": ielts_serializers.IeltsSelectInsertSubmit,
-        "options_submit": ielts_serializers.IeltsOptionsSubmit,
         "writing_submit": ielts_serializers.IeltsWritingSubmit,
         "speaking_submit": ielts_serializers.IeltsSpeakingSubmit,
+        "reading_submit": ielts_serializers.IeltsReadingSubmit,
+        "listening_submit": ielts_serializers.IeltsListeningSubmit,
     }
 
     _service = services.IeltsSubmitService()
 
-    # @action(detail=True, methods=["post"], url_path="fill-blank-submit")
-    # def fill_blank_submit(self, request, pk: int = None):
-    #     ser = self.get_serializer(data=request.data)
-    #     ser.is_valid(raise_exception=True)
-    #     self._service.fill_blank_submit(ser.validated_data, request.user)
-    #     return Response({"detail": "Fill‑in‑the‑blank answers saved."}, status=status.HTTP_201_CREATED)
-
-    # @action(detail=True, methods=["post"], url_path="select-insert-submit")
-    # def select_insert_submit(self, request, pk: int = None):
-    #     ser = self.get_serializer(data=request.data)
-    #     ser.is_valid(raise_exception=True)
-    #     return Response(status=status.HTTP_201_CREATED)
-
-    # @action(detail=True, methods=["post"], url_path="options-submit")
-    # def options_submit(self, request, pk: int = None):
-    #     ser = self.get_serializer(data=request.data)
-    #     ser.is_valid(raise_exception=True)
-    #     return Response(status=status.HTTP_201_CREATED)
-    #
-    # @action(detail=True, methods=["post"], url_path="writing-submit")
-    # def writing_submit(self, request, pk: int = None):
-    #     ser = self.get_serializer(data=request.data)
-    #     ser.is_valid(raise_exception=True)
-    #     return Response(status=status.HTTP_201_CREATED)
+    @action(detail=True, methods=["post"], url_path="writing-submit")
+    def writing_submit(self, request, pk: int = None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        score = self._service.writing_submit(pk, serializer.validated_data, request.user)
+        return Response({"score": score}, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["post"], url_path="speaking-submit")
     def speaking_submit(self, request, pk: int = None):
-        ser = self.get_serializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        score = self._service.speaking_submit(pk, ser.validated_data, request.user)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        score = self._service.speaking_submit(pk, serializer.validated_data, request.user)
+        return Response({"score": score}, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["post"], url_path="reading-submit")
+    def reading_submit(self, request, pk: int = None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        score = self._service.reading_submit(pk, serializer.validated_data, request.user)
+        return Response({"score": score}, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["post"], url_path="listening-submit")
+    def listening_submit(self, request, pk: int = None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        score = self._service.listening_submit(pk, serializer.validated_data, request.user)
         return Response({"score": score}, status=status.HTTP_201_CREATED)
