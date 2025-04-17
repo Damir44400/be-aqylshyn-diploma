@@ -10,3 +10,15 @@ class ModuleScore(models.Model):
     score = models.FloatField(default=None, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class OptionAttempt(models.Model):
+    module_score = models.ForeignKey(ModuleScore, on_delete=models.CASCADE, related_name='option_attempts')
+    option_id = models.IntegerField()
+    question_id = models.IntegerField(null=True)
+
+
+class WritingAttempt(models.Model):
+    module_score = models.ForeignKey(ModuleScore, on_delete=models.CASCADE, related_name='writing_attempts')
+    writing = models.TextField()
+    ai_response = models.TextField()

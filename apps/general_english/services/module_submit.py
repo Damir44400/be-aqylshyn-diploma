@@ -3,10 +3,10 @@ from typing import Dict, Any, Optional, Union
 
 import nltk
 from rest_framework.exceptions import ValidationError
-from rest_framework.request import Request
 
 from apps.common import enums as common_enums
 from apps.general_english import models as general_english_models
+from apps.general_english import serializers as general_english_serializers
 from apps.llms import openai_cli
 from apps.llms.prompts.essay_checker_prompt import get_essay_checker_prompt
 from apps.llms.tasks import parse_json_response
@@ -15,19 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class ModuleSubmitService:
-    """Service for handling module submissions across different section types."""
-
     def _get_module_questions(self, module_id: int, section: str) -> Optional[Any]:
-        """
-        Retrieve questions for a specific module and section.
-
-        Args:
-            module_id: The ID of the module
-            section: The section type (reading, listening, etc.)
-
-        Returns:
-            QuerySet of questions or None if section not supported
-        """
         if section == common_enums.ModuleSectionType.READING:
             return general_english_models.ReadingQuestion.objects.filter(module_id=module_id)
         elif section == common_enums.ModuleSectionType.LISTENING:
@@ -36,18 +24,6 @@ class ModuleSubmitService:
 
     def _calculate_speaking_score(self, context: str, text: str, max_score: float = 1.0,
                                   tolerance: float = 0.5) -> float:
-        """
-        Calculate a score for speaking answers based on edit distance.
-
-        Args:
-            context: The expected text
-            text: The submitted text
-            max_score: Maximum possible score
-            tolerance: Error tolerance threshold
-
-        Returns:
-            Calculated score between 0 and max_score
-        """
         if not context or not text:
             return 0.0
 
@@ -60,19 +36,6 @@ class ModuleSubmitService:
         return max_score if error_rate <= tolerance else 0.0
 
     def submit_option_answers(self, data: Dict[str, Any], module_id: int) -> float:
-        """
-        Submit and score option-based answers (reading, listening).
-
-        Args:
-            data: Submission data containing options
-            module_id: The module ID
-
-        Returns:
-            The calculated score
-
-        Raises:
-            ValidationError: If no questions are found
-        """
         score = 0
         section = data['section_name']
 
@@ -83,7 +46,7 @@ class ModuleSubmitService:
         module_questions = self._get_module_questions(module_id, section)
         if not module_questions:
             raise ValidationError(f"No module questions found for section {section}")
-
+        attempts = []
         for option in data.get('options', []):
             question_id = option.get('question_id')
             option_id = option.get('option_id')
@@ -101,28 +64,34 @@ class ModuleSubmitService:
             correct_option = question.options.filter(is_correct=True).first()
             if correct_option and correct_option.id == option_id:
                 score += 1
+            attempts.append(
+                (
+                    option_id,
+                    question_id
+                )
+            )
 
-        general_english_models.ModuleScore.objects.create(
+        module_score = general_english_models.ModuleScore.objects.create(
             module_id=module_id,
             section=section,
             score=score,
         )
+        (
+            general_english_models
+            .OptionAttempt.objects.bulk_create(
+                [
+                    general_english_models
+                    .OptionAttempt(
+                        option_id=attempt[0],
+                        question_id=attempt[1],
+                        module_score=module_score
+                    ) for attempt in attempts
+                ]
+            )
+        )
         return score
 
     def submit_speaking_answers(self, data: Dict[str, Any], module_id: int) -> float:
-        """
-        Submit and score speaking answers.
-
-        Args:
-            data: Submission data containing speaking answers
-            module_id: The module ID
-
-        Returns:
-            The calculated score
-
-        Raises:
-            ValidationError: If no speaking exercises are found
-        """
         score = 0
         section = data['section_name']
 
@@ -153,19 +122,6 @@ class ModuleSubmitService:
         return score
 
     def submit_writing_answers(self, data: Dict[str, Any], module_id: int) -> Union[float, None]:
-        """
-        Submit and score writing answers using AI evaluation.
-
-        Args:
-            data: Submission data containing writing text
-            module_id: The module ID
-
-        Returns:
-            The calculated score or None if evaluation fails
-
-        Raises:
-            ValidationError: If writing evaluation fails or writing not found
-        """
         section = data['section_name']
 
         general_english_models.ModuleScore.objects.filter(
@@ -221,28 +177,26 @@ class ModuleSubmitService:
         if final_score is None:
             raise ValidationError("Failed to evaluate writing submission after multiple attempts")
 
-        general_english_models.ModuleScore.objects.create(
+        module_score = general_english_models.ModuleScore.objects.create(
             module_id=module_id,
             section=section,
             score=final_score,
         )
+        (
+            general_english_models
+            .WritingAttempt.objects.create(
+                writing=writing_data,
+                module_score=module_score,
+                ai_response=parsed_response.get('improvements'),
+            )
+        )
 
         return final_score
 
+    from rest_framework.request import Request
+    from typing import Dict, Any
+
     def get_score(self, request: Request, module_id: int) -> Dict[str, Any]:
-        """
-        Retrieve the score for a specific module and section.
-
-        Args:
-            request: The HTTP request containing section_name query param
-            module_id: The module ID
-
-        Returns:
-            Dictionary with section and score
-
-        Raises:
-            ValidationError: If score not found or parameters invalid
-        """
         section_name = request.query_params.get('section_name')
         if not section_name:
             raise ValidationError("No section_name query parameter provided")
@@ -251,15 +205,57 @@ class ModuleSubmitService:
         if not module:
             raise ValidationError(f"Module with ID {module_id} not found")
 
-        module_scores = general_english_models.ModuleScore.objects.filter(module_id=module_id)
-        if not module_scores.exists():
-            raise ValidationError("No scores found for this module")
+        module_section_score = general_english_models.ModuleScore.objects.filter(
+            module_id=module_id, section=section_name
+        ).first()
 
-        module_section_score = module_scores.filter(section=section_name).first()
         if not module_section_score:
             raise ValidationError(f"No score found for section '{section_name}'")
 
-        return {
+        payload = {
             "section": section_name,
             "score": module_section_score.score,
         }
+
+        if section_name == "WRITING":
+            writing_attempt = general_english_models.WritingAttempt.objects.filter(
+                module_score=module_section_score
+            ).first()
+
+            if writing_attempt:
+                payload["writing"] = {
+                    "user_text": writing_attempt.writing,
+                    "ai_feedback": writing_attempt.ai_response,
+                }
+
+        elif section_name in ["READING", "LISTENING"]:
+            test = []
+            if section_name == "READING":
+                questions = general_english_models.ReadingQuestion.objects.filter(module=module)
+                question_serializer_class = general_english_serializers.ReadingQuestionSerializer
+            else:
+                questions = general_english_models.ListeningQuestion.objects.filter(module=module)
+                question_serializer_class = general_english_serializers.ListeningQuestionSerializer
+
+            for question in questions:
+                q_data = question_serializer_class(question).data
+
+                options = []
+                user_chosen_option = general_english_models.OptionAttempt.objects.filter(
+                    question_id=question.pk,
+                    module_score=module_section_score
+                ).first()
+
+                for option in question.options.all():
+                    options.append({
+                        "option": option.option,
+                        "is_correct": option.is_correct,
+                        "is_chosen": user_chosen_option and option.pk == user_chosen_option.option_id,
+                    })
+
+                q_data["options"] = options
+                test.append(q_data)
+
+            payload["test"] = test
+
+        return payload

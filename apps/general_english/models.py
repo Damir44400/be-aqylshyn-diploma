@@ -9,6 +9,8 @@ from .entity_models.speaking import Speaking
 from .entity_models.trial_option import TrialOption
 from .entity_models.trial_question import TrialQuestion
 from .entity_models.user_progress import UserProgress
+from .entity_models.module_score import OptionAttempt
+from .entity_models.module_score import WritingAttempt
 
 __all__ = [
     Module,
@@ -22,4 +24,6 @@ __all__ = [
     ListeningQuestion,
     ListeningOption,
     ModuleScore,
+    OptionAttempt,
+    WritingAttempt,
 ]

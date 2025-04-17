@@ -16,3 +16,5 @@ from .entity_serializers.module_submit import ModuleSpeakingSubmitSerializer
 from .entity_serializers.module_submit import ModuleOptionSubmitSerializer
 from .entity_serializers.module_submit import ModuleWritingSubmitSerializer
 from .entity_serializers.module_submit import ModuleScoreSerializer
+from .entity_serializers.module_submit import OptionAttemptSerializer
+from .entity_serializers.module_submit import WritingAttemptSerializer

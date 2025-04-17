@@ -26,3 +26,13 @@ class ModuleSpeakingSubmitSerializer(serializers.Serializer):
 class ModuleScoreSerializer(serializers.Serializer):
     section = serializers.CharField()
     score = serializers.IntegerField()
+
+
+class OptionAttemptSerializer(serializers.Serializer):
+    option_id = serializers.IntegerField()
+    question_id = serializers.IntegerField()
+
+
+class WritingAttemptSerializer(serializers.Serializer):
+    writing = serializers.CharField()
+    ai_response = serializers.CharField()

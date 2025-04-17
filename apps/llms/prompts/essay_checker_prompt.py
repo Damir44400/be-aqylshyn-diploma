@@ -25,7 +25,8 @@ RESPONSE FORMAT:
 Return valid JSON only with this exact structure:
 {
   "writing": {
-    "score": "there write score"
+    "score": "there write score",
+    "improvements": "Provide detailed, constructive feedback. Highlight grammar issues and writing weaknesses using <red></red> tags to mark problem areas."
   }
 }
 
