@@ -31,7 +31,7 @@ def check_module_completion(sender, instance, created, **kwargs):
             module.save(update_fields=['is_completed'])
 
         progress, _ = models.UserProgress.objects.get_or_create(
-            user_course=module.user_course,
+            course=module.user_course.course,
             defaults={'last_module': None}
         )
 
