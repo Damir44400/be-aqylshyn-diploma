@@ -1,9 +1,15 @@
 from rest_framework import serializers
 
+from apps.common import enums
+from apps.courses import models as course_models
+from apps.general_english import models as general_english_models
+from apps.general_english import serializers as general_english_serializers
 from apps.users import models as user_models
 
 
 class UserSerializer(serializers.ModelSerializer):
+    user_progress = serializers.SerializerMethodField()
+
     class Meta:
         model = user_models.User
         fields = (
@@ -12,7 +18,13 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "email",
             "is_staff",
+            "user_progress"
         )
+
+    def get_user_progress(self, obj):
+        course = course_models.Course.objects.filter(type=enums.CourseType.GENERAL_ENGLISH).all()
+        user_progress = general_english_models.UserProgress.objects.filter(course__in=course).all()
+        return general_english_serializers.UserProgressSerializer(user_progress, many=True).data
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

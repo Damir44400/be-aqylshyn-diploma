@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from .entity_models.ielts_speaking import IeltsSpeakingQuestion
 from .models import (
     IeltsModule,
     IeltsSubModule,
@@ -134,6 +135,13 @@ class IeltsWritingAdmin(admin.ModelAdmin):
     fields = ('title', 'description', 'context', 'test')
 
 
+# ───────────── Speaking Admins ─────────────
+@admin.register(IeltsSpeakingQuestion)
+class IeltsSpeakingQuestionAdmin(admin.ModelAdmin):
+    list_display = ('question', 'test')
+    fields = ('question', 'additional_information', "test")
+
+
 # ───────────── IeltsTest Admin (Combining Reading, Writing, & Listening) ─────────────
 
 class IeltsReadingInline(admin.TabularInline):
@@ -151,7 +159,12 @@ class IeltsListeningInline(admin.TabularInline):
     extra = 1
 
 
+class IeltsSpeakingInline(admin.TabularInline):
+    model = IeltsSpeakingQuestion
+    extra = 1
+
+
 @admin.register(IeltsTest)
 class IeltsTestAdmin(admin.ModelAdmin):
     list_display = ('name', 'sub_model')
-    inlines = [IeltsReadingInline, IeltsWritingInline, IeltsListeningInline]
+    inlines = [IeltsReadingInline, IeltsWritingInline, IeltsListeningInline, IeltsSpeakingInline]

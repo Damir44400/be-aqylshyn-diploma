@@ -12,7 +12,7 @@ class Module(models.Model):
         related_name="user_modules",
     )
     improvement = models.TextField(verbose_name=_("Қолданушыға бағытталған күшейтулер"))
-
+    order = models.IntegerField(null=True)
     has_writing = models.BooleanField(default=True)
     has_reading = models.BooleanField(default=True)
     has_listening = models.BooleanField(default=True)

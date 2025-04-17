@@ -291,6 +291,7 @@ def generate_modules(self, user_course_id, score, user_answers_log):
             attempt += 1
 
         with transaction.atomic():
+            order = 1
             general_english_models.Module.objects.filter(user_course_id=user_course_id).delete()
             modules = []
             for i, module_info in enumerate(modules_data, start=1):
@@ -301,7 +302,8 @@ def generate_modules(self, user_course_id, score, user_answers_log):
                     has_writing=True,
                     has_reading=True,
                     has_listening=True,
-                    has_speaking=True
+                    has_speaking=True,
+                    order=order
                 )
 
                 _create_reading_for_module(created_module, user_level)
@@ -309,6 +311,7 @@ def generate_modules(self, user_course_id, score, user_answers_log):
                 _create_listening_for_module(created_module, user_level)
                 _create_speaking_for_module(created_module, user_level)
                 modules.append(created_module)
+                order += 1
             user_course.last_module = modules[0]
             user_course.level = user_level
             user_course.save()
