@@ -3,6 +3,7 @@ from typing import Dict, Any, Optional, Union
 
 import nltk
 from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
 
 from apps.common import enums as common_enums
 from apps.general_english import models as general_english_models
@@ -146,7 +147,7 @@ class ModuleSubmitService:
 
         max_attempts = 3
         final_score = None
-
+        improvements = ""
         for attempt in range(max_attempts):
             try:
                 logger.info(f"Writing evaluation attempt {attempt + 1}/{max_attempts}")
@@ -161,6 +162,7 @@ class ModuleSubmitService:
 
                 parsed_response = parse_json_response(response_text)
                 score = parsed_response.get('writing').get('score')
+                improvements = parsed_response.get('writing').get('improvements')
                 if score is not None:
                     try:
                         final_score = float(score)
@@ -187,14 +189,11 @@ class ModuleSubmitService:
             .WritingAttempt.objects.create(
                 writing=writing_data,
                 module_score=module_score,
-                ai_response=parsed_response.get('improvements'),
+                ai_response=improvements,
             )
         )
 
         return final_score
-
-    from rest_framework.request import Request
-    from typing import Dict, Any
 
     def get_score(self, request: Request, module_id: int) -> Dict[str, Any]:
         section_name = request.query_params.get('section_name')
@@ -216,6 +215,8 @@ class ModuleSubmitService:
             "section": section_name,
             "score": module_section_score.score,
         }
+
+        print(section_name)
 
         if section_name == "WRITING":
             writing_attempt = general_english_models.WritingAttempt.objects.filter(
@@ -239,7 +240,6 @@ class ModuleSubmitService:
 
             for question in questions:
                 q_data = question_serializer_class(question).data
-
                 options = []
                 user_chosen_option = general_english_models.OptionAttempt.objects.filter(
                     question_id=question.pk,

@@ -179,9 +179,8 @@ class ModuleSubmitsView(
     def get_score(self, request: Request, module_id: int) -> Response:
         """Retrieve the score for a specific module section."""
         try:
-            instance = self.service.get_score(request, module_id)
-            serializer = self.get_serializer(instance)
-            return Response(serializer.data)
+            data = self.service.get_score(request, module_id)
+            return Response(data)
         except Exception as e:
             return Response(
                 {"error": f"Failed to retrieve score: {str(e)}"},
