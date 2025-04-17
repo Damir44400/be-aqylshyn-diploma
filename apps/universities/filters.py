@@ -1,41 +1,19 @@
 import django_filters
-from django.db.models import Q
 
-from apps.universities.models import University
+from .models import University
 
 
 class UniversityFilter(django_filters.FilterSet):
+    id = django_filters.NumberFilter(field_name="id")
     name = django_filters.CharFilter(field_name="name", lookup_expr="icontains")
-    location = django_filters.CharFilter(method="filter_location")
-    degree_type = django_filters.CharFilter(method="filter_degree_type")
-    duration = django_filters.CharFilter(method="filter_duration")
-    languages = django_filters.CharFilter(method="filter_languages")
-    study_formats = django_filters.CharFilter(method="filter_study_formats")
-    fields_of_study = django_filters.CharFilter(method="filter_fields_of_study")
-
-    def filter_location(self, queryset, name, value):
-        return queryset.filter(location__name__icontains=value)
-
-    def filter_degree_type(self, queryset, name, value):
-        return queryset.filter(degree_type__name__icontains=value)
-
-    def filter_duration(self, queryset, name, value):
-        return queryset.filter(
-            Q(duration__duration__icontains=value) | Q(duration__prefix__icontains=value)
-        )
-
-    def filter_languages(self, queryset, name, value):
-        return queryset.filter(languages__name__icontains=value)
-
-    def filter_study_formats(self, queryset, name, value):
-        return queryset.filter(study_formats__name__icontains=value)
-
-    def filter_fields_of_study(self, queryset, name, value):
-        return queryset.filter(fields_of_study__name__icontains=value)
+    fields_of_study = django_filters.BaseInFilter(field_name="fields_of_study__id", lookup_expr="in")
+    languages = django_filters.CharFilter(field_name="languages__id", lookup_expr="icontains")
+    study_formats = django_filters.CharFilter(field_name="study_formats__id", lookup_expr="icontains")
 
     class Meta:
         model = University
         fields = [
+            "id",
             "name",
             "location",
             "degree_type",
