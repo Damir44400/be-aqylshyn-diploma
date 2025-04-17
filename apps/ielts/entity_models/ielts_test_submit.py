@@ -11,6 +11,6 @@ class IeltsTestSubmit(models.Model):
 
     user = models.ForeignKey(user_models.User, on_delete=models.CASCADE)
 
-    score = models.IntegerField()
+    score = models.FloatField()
 
     submitted_at = models.DateTimeField(auto_now_add=True)

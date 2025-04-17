@@ -9,7 +9,7 @@ from apps.ielts.entity_serializer.ielts_test_submit import IeltsWritingSubmit
 from apps.ielts.entity_serializer.ielts_writing import IeltsWritingSerializer
 from apps.ielts.entity_serializer.listening.listening import IeltsListeningSerializer
 from apps.ielts.entity_serializer.readings.reading import IeltsReadingSerializer
-
+from apps.ielts.entity_serializer.ielts_test_submit import IeltsSpeakingSubmit
 __all__ = [
     'IeltsModuleSerializer',
     'IeltsReadingSerializer',
@@ -22,4 +22,5 @@ __all__ = [
     "IeltsOptionsSubmit",
     "IeltsFillBlankSubmit",
     "IeltsWritingSubmit",
+    "IeltsSpeakingSubmit",
 ]

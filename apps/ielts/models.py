@@ -13,6 +13,7 @@ from .entity_models.readings.reading_options import IeltsReadingFillBlank
 from .entity_models.readings.reading_options import IeltsReadingOption
 from .entity_models.readings.reading_options import IeltsReadingSelectInsert
 from .entity_models.readings.reading_question import IeltsReadingQuestion
+from .entity_models.ielts_speaking_question import IeltsSpeakingQuestion
 
 admin_models = [
     IeltsModule,
@@ -29,5 +30,6 @@ admin_models = [
     IeltsWriting,
     WritingImage,
     IeltsTest,
-    IeltsTestSubmit
+    IeltsTestSubmit,
+    IeltsSpeakingQuestion
 ]
