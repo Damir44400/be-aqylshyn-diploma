@@ -9,6 +9,8 @@ from ...common import enums
 
 
 class IeltsTestSerializer(serializers.ModelSerializer):
+    passed_sections = serializers.SerializerMethodField()
+
     class Meta:
         model = ielts_models.IeltsTest
         fields = (
@@ -56,7 +58,6 @@ class IeltsTestDetailSerializer(IeltsTestSerializer):
     listening_parts = listening.IeltsListeningSerializer(many=True)
     writing_tasks = ielts_writing.IeltsWritingSerializer(many=True)
     speaking_parts = ielts_speaking_parts.IeltsSpeakingPartsSerializer(many=True)
-    passed_sections = serializers.SerializerMethodField()
 
     class Meta(IeltsTestSerializer.Meta):
         fields = IeltsTestSerializer.Meta.fields + (
