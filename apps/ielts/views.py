@@ -20,6 +20,7 @@ class IeltsViewSet(
         "list": ielts_serializers.IeltsModuleSerializer,
         "test_detail": ielts_serializers.IeltsTestDetailSerializer,
     }
+    permission_classes = [permissions.IsAuthenticated]
 
     @extend_schema(
         responses=ielts_serializers.IeltsTestDetailSerializer,
@@ -30,10 +31,11 @@ class IeltsViewSet(
                 value={
                     "id": 1,
                     "name": "IELTS Test #1",
-                    "readings": [
+                    "reading_passages": [
                         {
                             "id": 123,
                             "title": "About U",
+                            "part": "Part",
                             "content": "Some reading passage goes here.",
                             "questions": [
                                 {
@@ -74,7 +76,7 @@ class IeltsViewSet(
                             ]
                         },
                     ],
-                    "listenings": [
+                    "listening_parts": [
                         {
                             "id": 1,
                             "title": "About u",
@@ -112,12 +114,25 @@ class IeltsViewSet(
                             ]
                         }
                     ],
-                    "writings": [
+                    "writing_tasks": [
                         {
                             "id": 789,
                             "title": "Sample writing task",
                             "description": "Describe the chart",
                             "images": []
+                        }
+                    ],
+                    "speaking_parts": [
+                        {
+                            "id": 1,
+                            "part": "Part",
+                            "speaking_questions": [
+                                {
+                                    "id": 1001,
+                                    "question": "What is the capital of France?",
+                                    "additional_information": "What is the capital of France?",
+                                }
+                            ]
                         }
                     ]
                 },

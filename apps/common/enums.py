@@ -38,3 +38,24 @@ class IeltsListeningQuestionType(models.TextChoices):
 class ChatSenderType(models.TextChoices):
     USER = "USER", _("User")
     AI = "AI", _("AI")
+
+
+class IeltsWritingPart(models.IntegerChoices):
+    PART1 = 1, "Part 1"
+    PART2 = 2, "Part 2"
+
+class IELTSSpeakingPart(models.IntegerChoices):
+    PART1 = 1, "Part 1 (Interview)"
+    PART2 = 2, "Part 2 (Long Turn / Cue Card)"
+    PART3 = 3, "Part 3 (Discussion)"
+
+class IELTSListeningPart(models.IntegerChoices):
+    PART1 = 1, "Part 1"
+    PART2 = 2, "Part 2"
+    PART3 = 3, "Part 3"
+    PART4 = 4, "Part 4"
+
+class IELTSReadingPassage(models.IntegerChoices):
+    PASSAGE_1 = 1, "Passage 1"
+    PASSAGE_2 = 2, "Passage 2"
+    PASSAGE_3 = 3, "Passage 3"

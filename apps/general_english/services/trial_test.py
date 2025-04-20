@@ -54,10 +54,15 @@ class TrialTestService:
                 f"User Answer: {selected_option.option}\n"
             )
             if correct_option:
-                user_answers_log+=f"Correct Answer: {correct_option.option}\n" if question.question_type == common_enums.QuestionType.SINGLE_CHOICE else ""
+                user_answers_log += f"Correct Answer: {correct_option.option}\n" if question.question_type == common_enums.QuestionType.SINGLE_CHOICE else ""
 
         user_answers_log += f"\n\n\nUser scored in test quizzes: {score}"
 
+        user_user_progress = general_english_models.UserProgress.objects.filter(
+            user=user, course_id=course_id
+        )
+        if user_user_progress:
+            user_user_progress.delete()
         user_progress = general_english_models.UserProgress.objects.create(
             user=user,
             course_id=course_id,

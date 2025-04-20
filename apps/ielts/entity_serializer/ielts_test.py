@@ -1,9 +1,11 @@
 from rest_framework import serializers
 
 from apps.ielts import models as ielts_models
-from . import ielts_writing, ielts_speaking
+from . import ielts_writing
 from .listening import listening
 from .readings import reading
+from .speakings import ielts_speaking_parts
+from ...common import enums
 
 
 class IeltsTestSerializer(serializers.ModelSerializer):
@@ -11,20 +13,55 @@ class IeltsTestSerializer(serializers.ModelSerializer):
         model = ielts_models.IeltsTest
         fields = (
             "id",
-            "name"
+            "name",
+            "passed_sections",
         )
+
+    def get_passed_sections(self, obj):
+        user = self.context.get("request").user
+        sections = [
+            enums.ModuleSectionType.LISTENING,
+            enums.ModuleSectionType.READING,
+            enums.ModuleSectionType.WRITING,
+            enums.ModuleSectionType.SPEAKING
+        ]
+        payload = []
+        for section in sections:
+            section_score = ielts_models.IeltsTestSubmit.objects.filter(
+                test=obj,
+                section=section,
+                user=user,
+            ).only("score").first()
+            if section_score:
+                payload.append(
+                    {
+                        "section": section,
+                        "is_passed": True,
+                        "score": section_score.score,
+                    }
+                )
+            else:
+                payload.append(
+                    {
+                        "section": section,
+                        "is_passed": False,
+                        "score": None,
+                    }
+                )
+        return payload
 
 
 class IeltsTestDetailSerializer(IeltsTestSerializer):
-    readings = reading.IeltsReadingSerializer(many=True)
-    listenings = listening.IeltsListeningSerializer(many=True)
-    writings = ielts_writing.IeltsWritingSerializer(many=True)
-    speakings = ielts_speaking.IeltsSpeakingSerializer(many=True)
+    reading_passages = reading.IeltsReadingSerializer(many=True)
+    listening_parts = listening.IeltsListeningSerializer(many=True)
+    writing_tasks = ielts_writing.IeltsWritingSerializer(many=True)
+    speaking_parts = ielts_speaking_parts.IeltsSpeakingPartsSerializer(many=True)
+    passed_sections = serializers.SerializerMethodField()
 
     class Meta(IeltsTestSerializer.Meta):
         fields = IeltsTestSerializer.Meta.fields + (
-            "readings",
-            "listenings",
-            "writings",
-            "speakings",
+            "reading_passages",
+            "listening_parts",
+            "writing_tasks",
+            "speaking_parts",
         )

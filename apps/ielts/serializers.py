@@ -1,6 +1,5 @@
 from apps.ielts.entity_serializer.ielts_module import IeltsModuleSerializer
 from apps.ielts.entity_serializer.ielts_sub_module import IeltsSubModuleDetailSerializer
-from apps.ielts.entity_serializer.ielts_sub_module import IeltsSubModuleSerializer
 from apps.ielts.entity_serializer.ielts_test import IeltsTestDetailSerializer
 from apps.ielts.entity_serializer.ielts_test_submit import IeltsListeningSubmit
 from apps.ielts.entity_serializer.ielts_test_submit import IeltsReadingSubmit
@@ -17,7 +16,6 @@ __all__ = [
     'IeltsReadingSerializer',
     'IeltsListeningSerializer',
     'IeltsWritingSerializer',
-    'IeltsSubModuleSerializer',
     'IeltsSubModuleDetailSerializer',
     'IeltsTestDetailSerializer',
     "IeltsWritingSubmit",

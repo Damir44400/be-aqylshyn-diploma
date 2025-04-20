@@ -30,10 +30,9 @@ def check_module_completion(sender, instance, created, **kwargs):
             module.is_completed = is_complete
             module.save(update_fields=['is_completed'])
 
-        progress, _ = models.UserProgress.objects.get_or_create(
-            course=module.user_course.course,
-            defaults={'last_module': None}
-        )
+        progress = models.UserProgress.objects.filter(
+            course=module.user_course.course
+        ).last()
 
         if is_complete:
             lookup = {

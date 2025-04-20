@@ -4,7 +4,6 @@ from typing import List
 from rest_framework.exceptions import ValidationError
 
 from apps.common import enums
-from apps.ielts.entity_models.ielts_speaking import IeltsSpeakingQuestion
 from apps.ielts.entity_models.ielts_test import IeltsTest
 from apps.ielts.entity_models.ielts_test_submit import IeltsTestSubmit
 from apps.ielts.entity_models.ielts_writing import IeltsWriting
@@ -15,6 +14,8 @@ from apps.ielts.entity_models.readings.reading import IeltsReading
 from apps.ielts.entity_models.readings.reading_options import IeltsReadingOption, IeltsReadingFillBlank, \
     IeltsReadingSelectInsert
 from apps.ielts.entity_models.readings.reading_question import IeltsReadingQuestion
+from apps.ielts.entity_models.speakings.speaking_parts import IeltsSpeakingPart
+from apps.ielts.entity_models.speakings.speaking_questions import IeltsSpeakingQuestion
 from apps.llms import openai_cli
 from apps.llms.tasks import parse_json_response
 
@@ -149,16 +150,18 @@ IMPORTANT:
         for item in speakings:
             answer = (item.get("answer") or "").strip()
             speaking_id = item.get("speaking_id")
-            db_sp = IeltsSpeakingQuestion.objects.filter(
-                pk=speaking_id, test=db_test
-            ).first()
-            if not db_sp:
-                logger.warning("Speaking question %s not found – skipped.", speaking_id)
-                continue
+            speaking_parts = IeltsSpeakingPart.objects.filter(test=db_test).all()
+            for speaking_part in speaking_parts:
+                db_sp = IeltsSpeakingQuestion.objects.filter(
+                    pk=speaking_id, part=speaking_part
+                ).first()
+                if not db_sp:
+                    logger.warning("Speaking question %s not found – skipped.", speaking_id)
+                    continue
 
-            payload_parts.append(
-                f"Question: {db_sp.question}\nCandidate answer: {answer}\n"
-            )
+                payload_parts.append(
+                    f"Question: {db_sp.question}\nCandidate answer: {answer}\n"
+                )
 
         if not payload_parts:
             raise ValidationError("No valid speaking answers provided.")
