@@ -35,7 +35,7 @@ class _ListeningSubmit(serializers.Serializer):
 
 
 class _ReadingSubmit(serializers.Serializer):
-    options = _SpeakingSubmit(many=True)
+    options = _OptionsSubmit(many=True)
     fills = _FillBlankSubmit(many=True)
     selects = _SelectInsertSubmit(many=True)
     reading_id = serializers.IntegerField()
