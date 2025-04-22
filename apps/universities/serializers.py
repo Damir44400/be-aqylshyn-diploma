@@ -82,8 +82,9 @@ class UniversityListSerializer(serializers.ModelSerializer):
         return obj.key_summary[:50] if obj.key_summary else None
 
     def get_is_favorite(self, obj):
-        user = self.context['request'].user
-        if not user.is_authenticated():
+        request = self.context.get('request')
+        user = getattr(request, 'user', None)
+        if not request or not user:
             return False
         return Favorite.objects.filter(user=user, university=obj).exists()
 
@@ -124,6 +125,6 @@ class UniversityDetailSerializer(serializers.ModelSerializer):
     def get_is_favorite(self, obj):
         request = self.context.get('request')
         user = getattr(request, 'user', None)
-        if not request or not user or not user.is_authenticated:
+        if not request or not user:
             return False
         return Favorite.objects.filter(user=user, university=obj).exists()
