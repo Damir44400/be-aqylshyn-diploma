@@ -12,7 +12,7 @@ class IeltsListening(models.Model):
         default=enums.IELTSListeningPart.PART1,
         verbose_name='Бөлім (Part)',
     )
-    test = models.OneToOneField(IeltsTest, on_delete=models.CASCADE, related_name='listening_parts')
+    test = models.OneToOneField(IeltsTest, on_delete=models.CASCADE, related_name='listening_part')
 
     def __str__(self):
         return self.title

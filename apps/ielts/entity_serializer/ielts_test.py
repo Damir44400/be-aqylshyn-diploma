@@ -62,7 +62,7 @@ class IeltsTestDetailSerializer(IeltsTestSerializer):
     class Meta(IeltsTestSerializer.Meta):
         fields = IeltsTestSerializer.Meta.fields + (
             "reading_passages",
-            "listening_parts",
+            "listening_part",
             "writing_tasks",
             "speaking_parts",
         )
