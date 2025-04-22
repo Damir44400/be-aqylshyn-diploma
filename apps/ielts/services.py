@@ -296,59 +296,54 @@ IMPORTANT:
             user=user
         ).delete()
 
-        listenings = data.get("listenings", [])
-        if not listenings:
+        listening = data.get("listening", None)
+        if not listening:
             raise ValidationError("Listenings list is empty.")
 
         total_score = 0
-        processed = False
 
-        for listening in listenings:
-            listening_id = listening.get("listening_id")
-            db_listening = IeltsListening.objects.filter(
-                pk=listening_id,
-                test=db_test
+        listening_id = listening.get("listening_id")
+        db_listening = IeltsListening.objects.filter(
+            pk=listening_id,
+            test=db_test
+        ).first()
+
+        processed = True
+
+        for option in listening.get("options", []):
+            question_id = option.get("question_id")
+            selected_id = option.get("option_id")
+            db_question = IeltsListeningQuestion.objects.filter(
+                pk=question_id,
+                listening=db_listening
             ).first()
-            if not db_listening:
-                logger.warning("Listening passage %s not found – skipped.", listening_id)
+            if not db_question:
+                logger.warning("Listening question %s not found – skipped.", question_id)
                 continue
 
-            processed = True
+            correct_pk = IeltsListeningOption.objects.filter(
+                question=db_question,
+                is_correct=True
+            ).values_list("pk", flat=True).first()
+            if correct_pk == selected_id:
+                total_score += 1
 
-            for option in listening.get("options", []):
-                question_id = option.get("question_id")
-                selected_id = option.get("option_id")
-                db_question = IeltsListeningQuestion.objects.filter(
-                    pk=question_id,
-                    listening=db_listening
-                ).first()
-                if not db_question:
-                    logger.warning("Listening question %s not found – skipped.", question_id)
-                    continue
+        for fill in listening.get("fills", []):
+            question_id = fill.get("question_id")
+            answer = (fill.get("answer") or "").strip()
+            db_question = IeltsListeningQuestion.objects.filter(
+                pk=question_id,
+                listening=db_listening
+            ).first()
+            if not db_question:
+                logger.warning("Fill question %s not found – skipped.", question_id)
+                continue
 
-                correct_pk = IeltsListeningOption.objects.filter(
-                    question=db_question,
-                    is_correct=True
-                ).values_list("pk", flat=True).first()
-                if correct_pk == selected_id:
-                    total_score += 1
-
-            for fill in listening.get("fills", []):
-                question_id = fill.get("question_id")
-                answer = (fill.get("answer") or "").strip()
-                db_question = IeltsListeningQuestion.objects.filter(
-                    pk=question_id,
-                    listening=db_listening
-                ).first()
-                if not db_question:
-                    logger.warning("Fill question %s not found – skipped.", question_id)
-                    continue
-
-                correct_answer = IeltsListeningFillBlank.objects.filter(
-                    question=db_question
-                ).values_list("answer", flat=True).first()
-                if correct_answer and correct_answer.strip().lower() == answer.lower():
-                    total_score += 1
+            correct_answer = IeltsListeningFillBlank.objects.filter(
+                question=db_question
+            ).values_list("answer", flat=True).first()
+            if correct_answer and correct_answer.strip().lower() == answer.lower():
+                total_score += 1
 
         if not processed:
             raise ValidationError("No valid listening answers provided.")

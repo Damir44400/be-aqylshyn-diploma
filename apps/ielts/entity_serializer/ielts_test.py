@@ -55,7 +55,7 @@ class IeltsTestSerializer(serializers.ModelSerializer):
 
 class IeltsTestDetailSerializer(IeltsTestSerializer):
     reading_passages = reading.IeltsReadingSerializer(many=True)
-    listening_parts = listening.IeltsListeningSerializer(many=True)
+    listening_part = listening.IeltsListeningSerializer(many=False)
     writing_tasks = ielts_writing.IeltsWritingSerializer(many=True)
     speaking_parts = ielts_speaking_parts.IeltsSpeakingPartsSerializer(many=True)
 

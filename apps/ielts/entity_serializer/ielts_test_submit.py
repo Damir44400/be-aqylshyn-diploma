@@ -54,4 +54,4 @@ class IeltsReadingSubmit(serializers.Serializer):
 
 
 class IeltsListeningSubmit(serializers.Serializer):
-    listenings = _ListeningSubmit(many=True)
+    listening = _ListeningSubmit(many=False)
