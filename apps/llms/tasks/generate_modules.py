@@ -70,12 +70,14 @@ def _create_reading_for_module(created_module, user_level):
         )
 
         options = question_data.get('options', [])
+        question_obj.save()
         for option_data in options:
-            general_english_models.ReadingOption.objects.create(
+            option = general_english_models.ReadingOption.objects.create(
                 question=question_obj,
                 option=option_data.get('option', ''),
                 is_correct=option_data.get('is_correct', False),
             )
+            option.save()
 
 
 def _create_writing_for_module(created_module, user_level):
@@ -113,11 +115,12 @@ def _create_writing_for_module(created_module, user_level):
         logger.error(f"Failed to create writing for module {created_module.name}. No valid response.")
         return
 
-    general_english_models.Writing.objects.create(
+    writing = general_english_models.Writing.objects.create(
         title=writing_data.get('title', ''),
         requirements=writing_data.get('requirements', ''),
         module=created_module,
     )
+    writing.save()
 
 
 def _create_listening_for_module(created_module, user_level):
@@ -182,12 +185,15 @@ def _create_listening_for_module(created_module, user_level):
             )
 
             options_data = question_data.get('options', [])
+            listening_question_obj.save()
             for option_data in options_data:
-                general_english_models.ListeningOption.objects.create(
+                option = general_english_models.ListeningOption.objects.create(
                     question=listening_question_obj,
                     option=option_data.get('option', ''),
                     is_correct=option_data.get('is_correct', False)
                 )
+
+                option.save()
 
         except Exception as e:
             logger.error(f"Failed to process listening question: {str(e)}")
@@ -233,10 +239,11 @@ def _create_speaking_for_module(created_module, user_level):
         attempt += 1
     sentences = speaking_data.get('sentences', [])
     for sentence in sentences:
-        general_english_models.Speaking.objects.create(
+        speaking = general_english_models.Speaking.objects.create(
             context=sentence.get('text', ''),
             module_id=created_module.pk
         )
+        speaking.save()
 
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=5)
@@ -312,6 +319,8 @@ def generate_modules(self, user_course_id, score, user_answers_log):
                 _create_speaking_for_module(created_module, user_level)
                 modules.append(created_module)
                 order += 1
+
+                created_module.save()
             user_course.last_module = modules[0]
             user_course.level = user_level
             user_course.save()

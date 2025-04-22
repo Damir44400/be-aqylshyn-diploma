@@ -6,6 +6,7 @@ from apps.common import mixins as common_mixins
 from apps.common import serializers as common_serializers
 from .models import Favorite
 from .serializers import FavoriteCreateSerializer, FavoriteSerializer
+from .services import FavoriteService
 
 
 # Create your views here.
@@ -24,9 +25,10 @@ class FavoriteViewSet(
     }
     permission_classes = (IsAuthenticated,)
     queryset = Favorite.objects.all()
+    service = FavoriteService()
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        self.service.insert_favorite(serializer.validated_data['university'], user=self.request.user)

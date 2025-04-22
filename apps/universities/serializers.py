@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from .favorites.models import Favorite
 from .models import (
     FieldsOfStudy,
     Location,
@@ -52,6 +53,7 @@ class UniversityListSerializer(serializers.ModelSerializer):
     duration = serializers.SerializerMethodField()
     languages = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
+    is_favorite = serializers.SerializerMethodField()
 
     class Meta:
         model = University
@@ -78,6 +80,12 @@ class UniversityListSerializer(serializers.ModelSerializer):
     def get_description(self, obj):
         return obj.key_summary[:50] if obj.key_summary else None
 
+    def get_is_favorite(self, obj):
+        user = self.context['request'].user
+        if not user.is_authenticated():
+            return False
+        return Favorite.objects.filter(user=user, university=obj).exists()
+
 
 class UniversityDetailSerializer(serializers.ModelSerializer):
     location = LocationSerializer()
@@ -86,7 +94,14 @@ class UniversityDetailSerializer(serializers.ModelSerializer):
     duration = DurationSerializer()
     degree_type = DegreeTypeSerializer()
     fields_of_study = FieldsOfStudySerializer(many=True)
+    is_favorite = serializers.SerializerMethodField()
 
     class Meta:
         model = University
         fields = '__all__'
+
+    def get_is_favorite(self, obj):
+        user = self.context['request'].user
+        if not user.is_authenticated():
+            return False
+        return Favorite.objects.filter(user=user, university=obj).exists()
