@@ -66,6 +66,7 @@ class UniversityListSerializer(serializers.ModelSerializer):
             'location',
             'languages',
             'description',
+            'is_favorite',
         )
 
     def get_location(self, obj):
@@ -98,10 +99,31 @@ class UniversityDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = University
-        fields = '__all__'
+        fields = (
+            'id',
+            'name',
+            'image',
+            'about',
+            'logo',
+            'is_favorite',
+            'languages',
+            'study_formats',
+            'duration',
+            'location',
+            'degree_type',
+            'fields_of_study',
+            'key_summary',
+            'introduction',
+            'academic_requirements',
+            'scholarships_funding',
+            'tuition_fees',
+            'pace',
+            'application_deadline',
+        )
 
     def get_is_favorite(self, obj):
-        user = self.context['request'].user
-        if not user.is_authenticated():
+        request = self.context.get('request')
+        user = getattr(request, 'user', None)
+        if not request or not user or not user.is_authenticated:
             return False
         return Favorite.objects.filter(user=user, university=obj).exists()
