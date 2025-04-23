@@ -34,7 +34,7 @@ class AuthView(common_mixins.ActionSerializerMixin, viewsets.GenericViewSet):
         return Response({"detail": "User created"}, status=status.HTTP_201_CREATED)
 
     @extend_schema(tags=["reset password"])
-    @action(detail=False, methods=["post"], url_path="request_to_reset_password")
+    @action(detail=False, methods=["post"], url_path="request-resset-password")
     def request_to_reset_password(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -42,7 +42,7 @@ class AuthView(common_mixins.ActionSerializerMixin, viewsets.GenericViewSet):
         return Response({"detail": "OTP sent successfully"}, status=status.HTTP_200_OK)
 
     @extend_schema(tags=["reset password"])
-    @action(detail=False, methods=["post"], url_path="verify_request_to_reset_password")
+    @action(detail=False, methods=["post"], url_path="verify-request-password")
     def verify_request_to_reset_password(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
