@@ -1,6 +1,7 @@
 from drf_spectacular.utils import extend_schema
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from apps.common import mixins as common_mixins
 from apps.common import serializers as common_serializers
@@ -30,5 +31,8 @@ class FavoriteViewSet(
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
-    def perform_create(self, serializer):
-        self.service.insert_favorite(serializer.validated_data['university'], user=self.request.user)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        message = self.service.insert_favorite(serializer.validated_data['university'], user=self.request.user)
+        return Response({"message": message}, status=status.HTTP_200_OK)

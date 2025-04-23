@@ -86,7 +86,8 @@ class UniversityListSerializer(serializers.ModelSerializer):
         user = getattr(request, 'user', None)
         if not request or user.is_anonymous:
             return False
-        return Favorite.objects.filter(user=user, university=obj).exists()
+        favorite = Favorite.objects.filter(user=user, university=obj)
+        return True if favorite else False
 
 
 class UniversityDetailSerializer(serializers.ModelSerializer):
