@@ -1,26 +1,18 @@
 from rest_framework import serializers
 
 from apps.ielts import models
-from .listening_question import IeltsListeningQuestionSerializer
+from .listening_parts import IeltsListeningPartSerializer
 
 
 class IeltsListeningSerializer(serializers.ModelSerializer):
-    questions = IeltsListeningQuestionSerializer(
-        many=True, read_only=True
-    )
-
-    part_label = serializers.CharField(
-        source="get_part_display", read_only=True
-    )
+    listening_parts = IeltsListeningPartSerializer(many=True)
 
     class Meta:
         model = models.IeltsListening
         fields = (
             "id",
-            "part",
-            "part_label",
             "title",
             "audio_file",
-            "questions",
+            'listening_parts',
         )
         read_only_fields = fields

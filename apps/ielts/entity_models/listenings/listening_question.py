@@ -2,14 +2,15 @@ from django.db import models
 
 from apps.common import enums
 from apps.common.models import BaseModel
-from .listening import IeltsListening
+from .listening_parts import IeltsListeningPart
 
 
 class IeltsListeningQuestion(BaseModel):
-    listening = models.ForeignKey(
-        IeltsListening,
+    listening_part = models.ForeignKey(
+        IeltsListeningPart,
         on_delete=models.CASCADE,
-        related_name='questions'
+        related_name='questions',
+        null=True,
     )
     question_content = models.TextField(verbose_name='Question Text')
 

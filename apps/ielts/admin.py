@@ -14,6 +14,7 @@ from .models import (
     IeltsWriting,
     WritingImage,
     IeltsListening,
+    IeltsListeningPart,
     IeltsListeningQuestion,
     IeltsListeningOption,
     IeltsListeningFillBlank,
@@ -94,10 +95,22 @@ class IeltsListeningQuestionInline(admin.TabularInline):
     extra = 1
 
 
+class IeltsListeningPartInline(admin.TabularInline):
+    model = IeltsListeningPart
+    extra = 1
+
+
 @admin.register(IeltsListening)
 class IeltsListeningAdmin(admin.ModelAdmin):
     list_display = ('title', 'test')
-    fields = ('title', 'audio_file', 'test')
+    fields = ('title', 'test')
+    inlines = [IeltsListeningPartInline]
+
+
+@admin.register(IeltsListeningPart)
+class IeltsListeningPartAdmin(admin.ModelAdmin):
+    list_display = ('part', 'listening')
+    fields = ('part', 'listening')
     inlines = [IeltsListeningQuestionInline]
 
 
@@ -114,8 +127,8 @@ class IeltsListeningFillBlankInline(admin.StackedInline):
 
 @admin.register(IeltsListeningQuestion)
 class IeltsListeningQuestionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'question_content', 'question_type', 'listening')
-    fields = ('listening', 'question_content', 'question_type')
+    list_display = ('id', 'question_content', 'question_type', 'listening_part')
+    fields = ('listening_part', 'question_content', 'question_type')
     inlines = [
         IeltsListeningOptionInline,
         IeltsListeningFillBlankInline,
@@ -141,17 +154,18 @@ class IeltsSpeakingOptionInline(admin.TabularInline):
     extra = 1
     model = IeltsSpeakingQuestion
 
+
 @admin.register(IeltsSpeakingPart)
 class IeltsPartAdmin(admin.ModelAdmin):
     list_display = ('part', 'test')
     fields = ('part', "test")
     inlines = [IeltsSpeakingOptionInline]
 
+
 @admin.register(IeltsSpeakingQuestion)
 class IeltsSpeakingQuestionAdmin(admin.ModelAdmin):
     list_display = ('question', 'part')
     fields = ('question', 'additional_information', "part")
-
 
 
 # ───────────── IeltsTest Admin (Combining Reading, Writing, & Listening) ─────────────
@@ -174,7 +188,6 @@ class IeltsListeningInline(admin.TabularInline):
 class IeltsSpeakingInline(admin.TabularInline):
     model = IeltsSpeakingPart
     extra = 1
-
 
 
 @admin.register(IeltsTest)

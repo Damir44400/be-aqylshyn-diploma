@@ -9,12 +9,14 @@ from apps.ielts.entity_serializer.ielts_test_submit import IeltsWritingSubmit
 from apps.ielts.entity_serializer.ielts_test_submit import IeltsWritingSubmit
 from apps.ielts.entity_serializer.ielts_writing import IeltsWritingSerializer
 from apps.ielts.entity_serializer.listening.listening import IeltsListeningSerializer
+from apps.ielts.entity_serializer.listening.listening_parts import IeltsListeningPartSerializer
 from apps.ielts.entity_serializer.readings.reading import IeltsReadingSerializer
 
 __all__ = [
     'IeltsModuleSerializer',
     'IeltsReadingSerializer',
     'IeltsListeningSerializer',
+    'IeltsListeningPartSerializer',
     'IeltsWritingSerializer',
     'IeltsSubModuleDetailSerializer',
     'IeltsTestDetailSerializer',

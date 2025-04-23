@@ -296,7 +296,7 @@ IMPORTANT:
             user=user
         ).delete()
 
-        listening = data.get("listening", None)
+        listening = data.get("listening", {})
         if not listening:
             raise ValidationError("Listenings list is empty.")
 

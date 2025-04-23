@@ -1,21 +1,15 @@
 from django.db import models
 
-from apps.common import enums
-from ..ielts_test import IeltsTest
+from apps.ielts import models as ielts_models
 
 
 class IeltsListening(models.Model):
-    title = models.CharField()
+    title = models.CharField(max_length=255)
     audio_file = models.FileField()
-    part = models.PositiveSmallIntegerField(
-        choices=enums.IELTSListeningPart.choices,
-        default=enums.IELTSListeningPart.PART1,
-        verbose_name='Бөлім (Part)',
-    )
-    test = models.OneToOneField(IeltsTest, on_delete=models.CASCADE, related_name='listening_part')
+    test = models.OneToOneField(ielts_models.IeltsTest, on_delete=models.CASCADE, related_name='listening')
 
     def __str__(self):
-        return self.title
+        return f"{self.title} {self.test}"
 
     class Meta:
-        verbose_name_plural = "Listening | Audios"
+        verbose_name_plural = "Listening | Audio File"

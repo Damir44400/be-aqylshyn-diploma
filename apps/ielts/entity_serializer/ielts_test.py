@@ -55,14 +55,14 @@ class IeltsTestSerializer(serializers.ModelSerializer):
 
 class IeltsTestDetailSerializer(IeltsTestSerializer):
     reading_passages = reading.IeltsReadingSerializer(many=True)
-    listening_part = listening.IeltsListeningSerializer(many=False)
+    listening = listening.IeltsListeningSerializer(many=False)
     writing_tasks = ielts_writing.IeltsWritingSerializer(many=True)
     speaking_parts = ielts_speaking_parts.IeltsSpeakingPartsSerializer(many=True)
 
     class Meta(IeltsTestSerializer.Meta):
         fields = IeltsTestSerializer.Meta.fields + (
             "reading_passages",
-            "listening_part",
+            "listening",
             "writing_tasks",
             "speaking_parts",
         )
