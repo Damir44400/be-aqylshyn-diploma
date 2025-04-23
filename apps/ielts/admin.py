@@ -103,7 +103,7 @@ class IeltsListeningPartInline(admin.TabularInline):
 @admin.register(IeltsListening)
 class IeltsListeningAdmin(admin.ModelAdmin):
     list_display = ('title', 'test')
-    fields = ('title', 'test')
+    fields = ('title', 'audio_file', 'test')
     inlines = [IeltsListeningPartInline]
 
 
