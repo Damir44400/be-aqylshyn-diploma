@@ -58,7 +58,9 @@ class AuthView(common_mixins.ActionSerializerMixin, viewsets.GenericViewSet):
             value=session_token,
             httponly=True,
             secure=True,
-            max_age=3600
+            max_age=3600,
+            domain="api.aqylshyn.kz",
+            samesite="Lax"
         )
         return response
 
