@@ -43,6 +43,11 @@ class UniversityViewSet(
     filter_backends = [DjangoFilterBackend]
     filterset_class = UniversityFilter
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        filtered_queryset = self.filter_queryset(queryset)
+        return filtered_queryset.distinct()
+
     @action(detail=False, methods=['get'], url_path='locations')
     def locations(self, request, *args, **kwargs):
         queryset = Location.objects.all()
