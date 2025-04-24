@@ -13,13 +13,23 @@ class ChatSerializer(serializers.ModelSerializer):
 
 
 class ChatMessageSerializer(serializers.ModelSerializer):
+    sender_name = serializers.SerializerMethodField()
+
     class Meta:
         model = models.ChatMessage
         fields = (
             "id",
             "text",
-            "sender"
+            "sender",
+            "sender_name"
         )
+
+    def get_sender_name(self, obj):
+        if obj.sender == "USER":
+            return obj.chat.user.first_name
+        else:
+            return "AQYLBEK"
+
 
 
 class ChatDetailSerializer(serializers.ModelSerializer):

@@ -1,13 +1,71 @@
+from django.db.models import Sum
 from rest_framework import serializers
 
 from apps.common import enums
 from apps.courses import models as course_models
-from apps.general_english import models as general_english_models
-from apps.general_english import serializers as general_english_serializers
+from apps.general_english import models as ge_models
+from apps.general_english import serializers as ge_serializers
+from apps.ielts import models as ielts_models
 from apps.users import models as user_models
 
 
+class UserAchievementSerializer(serializers.Serializer):
+    progress = serializers.SerializerMethodField()
+    scores = serializers.SerializerMethodField()
+    level = serializers.SerializerMethodField()
+    courses = serializers.SerializerMethodField()
+
+    def get_progress(self, obj):
+        progress = self._get_user_progress()  # lazy-cache
+        return progress.get_progress if progress else None
+
+    def get_level(self, obj):
+        progress = self._get_user_progress()
+        return progress.level if progress else None
+
+    def get_courses(self, obj):
+        user = self._get_user()
+        res = []
+
+        if self._get_user_progress():
+            res.append("General English")
+
+        if ielts_models.IeltsTestSubmit.objects.filter(user=user).exists():
+            res.append("IELTS")
+
+        return res
+
+    def get_scores(self, obj):
+        user = self._get_user()
+        if not user:
+            return 0
+
+        total = (
+                    ge_models.ModuleScore
+                    .objects
+                    .filter(module__user_course__user=user)
+                    .aggregate(total=Sum("score"))
+                )["total"] or 0
+
+        return total
+
+    def _get_user(self):
+        return getattr(self.context.get("request"), "user", None)
+
+    def _get_user_progress(self):
+        if not hasattr(self, "_cached_progress"):
+            user = self._get_user()
+            self._cached_progress = (
+                ge_models.UserProgress.objects
+                .select_related("course")
+                .filter(user=user)
+                .first()
+            )
+        return self._cached_progress
+
+
 class UserSerializer(serializers.ModelSerializer):
+    achievement = serializers.SerializerMethodField()
     user_progress = serializers.SerializerMethodField()
 
     class Meta:
@@ -18,13 +76,27 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "email",
             "is_staff",
-            "user_progress"
+            "achievement",
+            "user_progress",
         )
 
+    def get_achievement(self, obj):
+        return UserAchievementSerializer(instance=obj, context=self.context).data
+
     def get_user_progress(self, obj):
-        course = course_models.Course.objects.filter(type=enums.CourseType.GENERAL_ENGLISH).all()
-        user_progress = general_english_models.UserProgress.objects.filter(course__in=course).all()
-        return general_english_serializers.UserProgressSerializer(user_progress, many=True).data
+        ge_course_ids = (
+            course_models.Course.objects
+            .filter(type=enums.CourseType.GENERAL_ENGLISH)
+            .values_list("id", flat=True)
+        )
+
+        progress_qs = (
+            ge_models.UserProgress.objects
+            .filter(user=obj, course_id__in=ge_course_ids)
+            .select_related("course")
+        )
+
+        return ge_serializers.UserProgressSerializer(progress_qs, many=True).data
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

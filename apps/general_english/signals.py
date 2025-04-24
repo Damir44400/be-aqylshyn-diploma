@@ -32,8 +32,7 @@ def check_module_completion(sender, instance, created, **kwargs):
 
         progress = models.UserProgress.objects.filter(
             course=module.user_course.course
-        ).last()
-
+        ).first()
         if is_complete:
             lookup = {
                 'user_course': module.user_course,
@@ -42,8 +41,7 @@ def check_module_completion(sender, instance, created, **kwargs):
             next_mod = models.Module.objects.filter(**lookup) \
                 .order_by('order') \
                 .first()
-
-            if next_mod and progress.last_module.id != next_mod.id:
+            if next_mod:
                 progress.last_module = next_mod
                 progress.save(update_fields=['last_module'])
 

@@ -4,10 +4,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.common import mixins as common_mixins
-from apps.general_english import serializers as general_english_serializers
-from apps.courses.entity_serializers import general_english as course_general_english_serializers
-from apps.general_english.services import trial_test
 from apps.courses import models as courses_models
+from apps.courses.entity_serializers import general_english as course_general_english_serializers
+from apps.general_english import serializers as general_english_serializers
+from apps.general_english.services import trial_test
 
 
 @extend_schema(tags=["general-english trial test"])
@@ -32,10 +32,9 @@ class TrialTestViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        result = self.service.trial_test_answer_check(course_id, serializer.validated_data, user)
+        score, user_level = self.service.trial_test_answer_check(course_id, serializer.validated_data, user)
 
-        return Response({"score": result}, status=200)
-
+        return Response({"score": score, "user_level": user_level}, status=200)
 
     @action(detail=False, methods=["get"], url_path="course/(?P<course_id>\d+)/trial-questions")
     def trial_questions(self, request, course_id=None):
