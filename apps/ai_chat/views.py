@@ -30,6 +30,7 @@ class ChatViewSet(common_mixins.ActionSerializerMixin, viewsets.GenericViewSet):
         if not queryset:
             raise ValidationError("Chat not found")
         queryset.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["post"], url_path="messages")
     def send_message(self, request):
