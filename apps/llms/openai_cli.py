@@ -11,11 +11,30 @@ class OpenAICLI:
     def send_request(self, system_prompt, **kwargs):
         try:
             user_data = kwargs.get("data", "")
+            chat_message = kwargs.get("chat_message", "")
+            context_fragments = kwargs.get("context_fragments", "")
+            if not isinstance(user_data, str):
+                user_data = str(user_data)
+
             messages = [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_data},
             ]
 
+            for context in context_fragments:
+                messages.append({"role": "user", "content": f"File context: {context}"})
+
+            if chat_message:
+                for chat in chat_message:
+                    role = "user"
+                    if chat.sender == "AI":
+                        role = "system"
+                    messages.append(
+                        {
+                            "role": role,
+                            "content": chat.text
+                        }
+                    )
 
             response = self.openai_cli.chat.completions.create(
                 model='gpt-4o-mini-2024-07-18',

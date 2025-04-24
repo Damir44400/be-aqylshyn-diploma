@@ -31,7 +31,6 @@ class ChatMessageSerializer(serializers.ModelSerializer):
             return "AQYLBEK"
 
 
-
 class ChatDetailSerializer(serializers.ModelSerializer):
     messages = ChatMessageSerializer(many=True, read_only=True)
 
@@ -47,3 +46,8 @@ class ChatDetailSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.Serializer):
     message = serializers.CharField()
     chat_id = serializers.IntegerField(required=False)
+    files = serializers.ListField(
+        child=serializers.FileField(),
+        required=False,
+        allow_empty=True,
+    )

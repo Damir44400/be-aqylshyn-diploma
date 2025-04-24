@@ -24,6 +24,13 @@ class ChatViewSet(common_mixins.ActionSerializerMixin, viewsets.GenericViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=["delete"], url_path="")
+    def delete_chats(self, request, pk=None):
+        queryset = Chats.objects.filter(user=request.user, id=pk).first()
+        if not queryset:
+            raise ValidationError("Chat not found")
+        queryset.delete()
+
     @action(detail=False, methods=["post"], url_path="messages")
     def send_message(self, request):
         serializer = self.get_serializer(data=request.data)
