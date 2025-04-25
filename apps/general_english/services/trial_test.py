@@ -70,7 +70,8 @@ class TrialTestService:
         )
 
         generate_modules.apply_async(
-            kwargs={"user_course_id": user_progress.pk, "score": score, "user_answers_log": user_answers_log})
+            kwargs={"user": user, "user_course_id": user_progress.pk, "score": score,
+                    "user_answers_log": user_answers_log})
         if score >= 8:
             user_level = "Advanced"  # C1-C2
         elif score >= 5:

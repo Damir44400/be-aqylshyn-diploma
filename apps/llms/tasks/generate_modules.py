@@ -5,6 +5,7 @@ import uuid
 from celery import shared_task
 from django.db import transaction
 
+from apps.common.services import EmailService
 from apps.common.utils import get_image_url
 from apps.general_english import models as general_english_models
 from apps.llms import openai_cli, elevenlab_cli
@@ -247,7 +248,7 @@ def _create_speaking_for_module(created_module, user_level):
 
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=5)
-def generate_modules(self, user_course_id, score, user_answers_log):
+def generate_modules(self, user, user_course_id, score, user_answers_log):
     if score >= 8:
         user_level = "Advanced"  # C1-C2
     elif score >= 5:
@@ -262,6 +263,15 @@ def generate_modules(self, user_course_id, score, user_answers_log):
         "max_possible_score": 10,
         "score_percentage": (score / 10) * 100 if score > 0 else 0,
     }
+
+    message = (
+        f"Hello,\n\n"
+        f"Your personal test has been successfully created. You can access it using the link below:\n\n"
+        f"https://edu-diploma.vercel.app/english/1\n\n"
+        f"Good luck!\n\n"
+        f"Best regards,\n"
+        f"EduDiploma Team"
+    )
 
     try:
         user_course = general_english_models.UserProgress.objects.get(id=user_course_id)
@@ -324,6 +334,12 @@ def generate_modules(self, user_course_id, score, user_answers_log):
             user_course.last_module = modules[0]
             user_course.level = user_level
             user_course.save()
+
+            EmailService().smtp(
+                subject="Your personal test is ready",
+                body=message,
+                to=[user.email],
+            )
             return True
 
     except Exception as e:
