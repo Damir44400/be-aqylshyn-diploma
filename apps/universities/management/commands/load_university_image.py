@@ -1,53 +1,45 @@
-import time
 import requests
-from io import BytesIO
-from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
+from django.core.files.base import ContentFile
 
 from apps.universities.models import University
 
+UNSPLASH_ACCESS_KEY = "7Eh_JiJRhfq_B-TIzziQF8uyYhBTlariJDnGfTgh6gQ"
+UNSPLASH_URL = "https://api.unsplash.com/search/photos"
+
+
+def get_unsplash_image(query):
+    params = {
+        "query": query,
+        "per_page": 1,
+        "orientation": "landscape",
+        "client_id": UNSPLASH_ACCESS_KEY,
+    }
+    try:
+        response = requests.get(UNSPLASH_URL, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        if data["results"]:
+            img_url = data["results"][0]["urls"]["full"]
+            img_data = requests.get(img_url, timeout=10).content
+            return img_data
+    except Exception as e:
+        print(f"Failed to fetch from Unsplash for '{query}': {e}")
+    return None
+
 
 class Command(BaseCommand):
-    def _get_driver(self):
-        options = Options()
-        options.add_argument("--headless")  # run in background
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        return webdriver.Chrome(options=options)
-
-    def _search_image(self, query):
-        driver = self._get_driver()
-        try:
-            search_url = f"https://www.google.com/search?tbm=isch&q={query}"
-            driver.get(search_url)
-            time.sleep(2)
-            thumbnails = driver.find_elements(By.CSS_SELECTOR, "img.Q4LuWd")
-            if thumbnails:
-                thumbnails[0].click()
-                time.sleep(2)
-                images = driver.find_elements(By.CSS_SELECTOR, "img.n3VNCb")
-                for img in images:
-                    src = img.get_attribute("src")
-                    if src and src.startswith("http"):
-                        return requests.get(src).content
-        except Exception as e:
-            print(f"Error for query {query}: {e}")
-        finally:
-            driver.quit()
-        return None
+    help = "Load and save university images from Unsplash"
 
     def handle(self, *args, **options):
         universities = University.objects.all()
         for university in universities:
-            print(f"Searching image for: {university.name}")
-            image_data = self._search_image(university.name)
+            self.stdout.write(f"Searching Unsplash for: {university.name}")
+            image_data = get_unsplash_image(university.name)
+
             if image_data:
-                image_file = ContentFile(image_data)
-                university.image.save(f"{university.name}.jpg", image_file)
+                university.image.save(f"{university.name}.jpg", ContentFile(image_data))
                 university.save()
-                print(f"Saved image for: {university.name}")
+                self.stdout.write(self.style.SUCCESS(f"Saved image for: {university.name}"))
             else:
-                print(f"No image found for: {university.name}")
+                self.stdout.write(self.style.WARNING(f"No image found for: {university.name}"))
