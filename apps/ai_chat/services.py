@@ -47,7 +47,7 @@ class ChatService:
         files = data.get('files', [])
 
         client = openai_cli.OpenAICLI()
-        chat_message = models.ChatMessage.objects.filter(chat_id=chat_id).order_by("-created_at")[:10]
+        chat_message = models.ChatMessage.objects.filter(chat_id=chat_id).order_by("-created_at")[:5]
         context_fragments = self._extract_text_context(files, client)
         system_prompt = self.SYSTEM_PROMPT
         try:

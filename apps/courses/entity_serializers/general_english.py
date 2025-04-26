@@ -1,4 +1,3 @@
-from django.db.models import QuerySet
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
@@ -68,29 +67,48 @@ class CourseGeneralEnglishModuleSerializer(CourseGeneralEnglishRetrieveSerialize
     @extend_schema_field(general_english_serializers.ModuleSerializer(many=True))
     def get_modules(self, obj):
         user = self.context['request'].user
+
         if hasattr(obj, 'user_course'):
             user_course = obj.user_course.filter(user=user).first()
-            if user_course:
-                modules_qs: QuerySet[general_english_models.Module] = user_course.user_modules.all().order_by("id")
-                for module in modules_qs:
-                    if module.is_completed:
-                        continue
-                    completed_sections = set(general_english_models.ModuleScore.objects.filter(
-                        module=module
-                    ).values_list('section', flat=True).distinct())
+            if not user_course:
+                return None
 
-                    required_sections = {
-                        enums.ModuleSectionType.WRITING,
-                        enums.ModuleSectionType.READING,
-                        enums.ModuleSectionType.SPEAKING,
-                        enums.ModuleSectionType.LISTENING,
-                    }
-                    is_complete = required_sections.issubset(completed_sections)
-                    print(f"Module complete: {is_complete}")
+            modules_qs = user_course.user_modules.all().order_by("order")
 
-                    if is_complete != module.is_completed:
-                        module.is_completed = is_complete
-                        module.save(update_fields=['is_completed'])
-                        print(f"Updated module {module.id} completion to {is_complete}")
-                return general_english_serializers.ModuleSerializer(modules_qs, many=True).data
+            module_scores = general_english_models.ModuleScore.objects.filter(
+                module__in=modules_qs
+            ).values('module_id', 'section').distinct()
+
+            from collections import defaultdict
+            module_sections = defaultdict(set)
+            for score in module_scores:
+                module_sections[score['module_id']].add(score['section'])
+
+            progress = general_english_models.UserProgress.objects.filter(
+                course=user_course.course
+            ).first()
+
+            required_sections = {
+                enums.ModuleSectionType.WRITING.value,
+                enums.ModuleSectionType.READING.value,
+                enums.ModuleSectionType.SPEAKING.value,
+                enums.ModuleSectionType.LISTENING.value,
+            }
+
+            for module in modules_qs:
+                completed_sections = module_sections.get(module.id, set())
+                is_complete = required_sections.issubset(completed_sections)
+
+                if module.is_completed != is_complete:
+                    module.is_completed = is_complete
+                    module.save(update_fields=['is_completed'])
+
+                if is_complete and progress:
+                    next_mod = modules_qs.filter(order__gt=module.order).order_by('order').first()
+                    if next_mod and progress.last_module != next_mod:
+                        progress.last_module = next_mod
+                        progress.save(update_fields=['last_module'])
+                    break
+            return general_english_serializers.ModuleSerializer(modules_qs, many=True).data
+
         return None

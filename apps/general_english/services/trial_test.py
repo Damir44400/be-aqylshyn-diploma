@@ -11,11 +11,11 @@ class TrialTestService:
     def trial_test_answer_check(course_id, data, user):
         score = 0
 
-        user_progress = general_english_models.UserProgress.objects.filter(
+        user_progresses = general_english_models.UserProgress.objects.filter(
             user=user, course_id=course_id
-        ).first()
-        if user_progress:
-            user_progress.delete()
+        )
+        if user_progresses:
+            user_progresses.delete()
 
         course = course_models.Course.objects.filter(id=course_id).first()
         if not course:
@@ -58,11 +58,6 @@ class TrialTestService:
 
         user_answers_log += f"\n\n\nUser scored in test quizzes: {score}"
 
-        user_user_progress = general_english_models.UserProgress.objects.filter(
-            user=user, course_id=course_id
-        )
-        if user_user_progress:
-            user_user_progress.delete()
         user_progress = general_english_models.UserProgress.objects.create(
             user=user,
             course_id=course_id,
