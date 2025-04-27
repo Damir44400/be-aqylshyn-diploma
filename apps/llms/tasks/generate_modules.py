@@ -15,6 +15,7 @@ from apps.llms.prompts.reading_generate_prompt import get_reading_prompt
 from apps.llms.prompts.speaking_generate_prompt import get_speaking_prompt
 from apps.llms.prompts.writing_generate_prompt import get_writing_prompt
 from apps.llms.tasks import parse_json_response
+from apps.users.models import User
 from core.settings import MEDIA_ROOT
 
 logger = logging.getLogger(__name__)
@@ -248,7 +249,10 @@ def _create_speaking_for_module(created_module, user_level):
 
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=5)
-def generate_modules(self, user, user_course_id, score, user_answers_log):
+def generate_modules(self, user_id, user_course_id, score, user_answers_log):
+    user = User.objects.filter(id=user_id).first()
+    if not user:
+        return
     if score >= 8:
         user_level = "Advanced"  # C1-C2
     elif score >= 5:

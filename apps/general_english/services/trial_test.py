@@ -21,11 +21,11 @@ class TrialTestService:
         if not course:
             raise ValidationError({"detail": "Course not found"})
 
-        trial_questions = general_english_models.TrialQuestion.objects.filter(course_id=course_id)
+        trial_questions = general_english_models.TrialQuestion.objects.filter(course_id=course_id).all()
         if not trial_questions.exists():
             raise ValidationError({"detail": 'No trial questions found for this course'})
 
-        question_map = {q.id: q for q in trial_questions}
+        question_map = {q.pk: q for q in trial_questions}
 
         user_answers_log = ""
 
@@ -65,7 +65,7 @@ class TrialTestService:
         )
 
         generate_modules.apply_async(
-            kwargs={"user": user, "user_course_id": user_progress.pk, "score": score,
+            kwargs={"user_id": user.id, "user_course_id": user_progress.pk, "score": score,
                     "user_answers_log": user_answers_log})
         if score >= 8:
             user_level = "Advanced"  # C1-C2
