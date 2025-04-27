@@ -36,6 +36,8 @@ class Command(BaseCommand):
 
     READING_GENERATOR_PROMPT = """
     You are generating IELTS Reading passages and questions.
+    GENERATE REAL IELTS READING PASSAGES AND QUESTIONS
+    AND GENERATE IN EACH PASSAGE DIFFERENCE TYPE OF QUESTION NOT ONLY OPTIONS TYPE 
 
     User will provide the test details
         
@@ -51,7 +53,7 @@ class Command(BaseCommand):
           "questions": [
             {
               "question_content": "<clear academic question>",
-              "question_type": "OPTIONS" | "FILL_BLANK" | "SELECT_INSERT",
+              "question_type": "OPTIONS" | "FILL" | "SELECT_INSERT",
               (based on type, include exactly one of the following:)
               - For OPTIONS:
                   "options": [
@@ -83,7 +85,9 @@ class Command(BaseCommand):
 
     LISTENING_GENERATOR_PROMPT = """
     You are generating IELTS Listening parts and questions.
-
+    GENERATE REAL IELTS READING PASSAGES AND QUESTIONS
+    AND GENERATE IN EACH PASSAGE DIFFERENCE TYPE OF QUESTION NOT ONLY OPTIONS TYPE
+     
     User will provide the test details
         
     Generate exactly 4 parts, each with exactly 5 questions.
@@ -91,14 +95,14 @@ class Command(BaseCommand):
     RESPONSE FORMAT:
     {
       "title": "<academic topic>",
-      "audio_file_context" : "500-600 words"
+      "audio_file_context" : "2000-3000 words"
       "parts": [
         {
           "part": 1,
           "questions": [
             {
               "question_content": "<clear academic question>",
-              "question_type": "OPTIONS" | "FILL_BLANK" | "SELECT_INSERT",
+              "question_type": "OPTIONS" | "FILL" | "SELECT_INSERT",
               (based on type, include exactly one of the following:)
               - For OPTIONS:
                   "options": [
