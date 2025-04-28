@@ -58,6 +58,7 @@ class ChatService:
                 chat_message=chat_message,
                 context_fragments=context_fragments,
             )
+            print(response)
             json_response = parse_json_response(response)
         except (json.JSONDecodeError, KeyError) as exc:
             print(exc)

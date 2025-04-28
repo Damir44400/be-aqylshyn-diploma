@@ -16,6 +16,7 @@ Response format:
     "answer": "Your expert response"
 }
 Always directly answer the user's question. Stay relevant and helpful.
+U Should return strong on the response format
 """
 
 
