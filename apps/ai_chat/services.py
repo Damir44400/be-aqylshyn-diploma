@@ -49,13 +49,23 @@ class ChatService:
 
         client = openai_cli.OpenAICLI()
         chat_message = models.ChatMessage.objects.filter(chat_id=chat_id).order_by("-created_at")[:5]
+        try:
+            chat_history = client.send_request(
+                "Summarize the chat meessage as like chat history on few sentence",
+                data='\n'.join([f"sender:{message.sender} text:{message.text}" for message in chat_message]),
+            )
+        except (json.JSONDecodeError, KeyError) as exc:
+            print(exc)
+            raise ValidationError(
+                "Не удалось обработать ответ модели. Попробуйте ещё раз."
+            ) from exc
         context_fragments = self._extract_text_context(files, client)
         system_prompt = self.SYSTEM_PROMPT
         try:
             response = client.send_request(
                 system_prompt,
                 data=message,
-                chat_message=chat_message,
+                chat_message=chat_history,
                 context_fragments=context_fragments,
             )
             print(response)

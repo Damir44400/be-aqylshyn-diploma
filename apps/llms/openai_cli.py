@@ -13,12 +13,12 @@ class OpenAICLI:
             context_fragments = kwargs.get("context_fragments", [])
             model = kwargs.get("model", "gpt-4o-mini-2024-07-18")
             messages = [{"role": "system", "content": system_prompt}]
-            for chat in reversed(chat_messages):
-                role = "assistant" if getattr(chat, "sender", "user") == "AI" else "user"
-                messages.append({"role": role, "content": getattr(chat, "text", "")})
+            if chat_messages:
+                messages.append({"role": "system", "content": f"History of chat: {chat_messages}"})
             if context_fragments:
                 combined_context = "\n\n".join(context_fragments)
                 messages.append({"role": "system", "content": f"Context from user files:\n{combined_context}"})
+
             if user_data:
                 messages.append({"role": "user", "content": user_data})
 
