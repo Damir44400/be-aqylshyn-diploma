@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 
@@ -89,6 +90,19 @@ class University(models.Model):
     tuition_fees = models.CharField(null=True)
     pace = models.CharField(default="Full Time")
     application_deadline = models.CharField(null=True)
+    
+    study_highlights = ArrayField(
+        models.TextField(),
+        verbose_name="Мұнда оқу нені білдіреді?",
+        blank=True,
+        null=True,
+    )
+    program_benefits = ArrayField(
+        models.TextField(),
+        verbose_name="Неге бұл бағдарламаны таңдау керек?",
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         return self.name

@@ -120,6 +120,8 @@ class UniversityDetailSerializer(serializers.ModelSerializer):
             'tuition_fees',
             'pace',
             'application_deadline',
+            "study_highlights",
+            "program_benefits"
         )
 
     def get_is_favorite(self, obj):
