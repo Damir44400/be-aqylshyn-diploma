@@ -71,6 +71,6 @@ class AuthService:
         if not user:
             raise ValidationError({"detail": "User not found, please try again or contact with support."})
 
-        user.password = data['password']
+        user.set_password(data['password'])
         user.save()
         return user
