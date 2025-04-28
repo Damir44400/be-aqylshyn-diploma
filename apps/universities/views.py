@@ -10,7 +10,7 @@ from .models import (
     Language,
     StudyFormat,
     DegreeType,
-    FieldsOfStudy,
+    FieldsOfStudy, Duration,
 )
 from .serializers import (
     UniversityListSerializer,
@@ -19,7 +19,7 @@ from .serializers import (
     LanguageSerializer,
     StudyFormatSerializer,
     DegreeTypeSerializer,
-    FieldsOfStudySerializer,
+    FieldsOfStudySerializer, DurationSerializer,
 )
 from ..common.mixins import ActionSerializerMixin
 
@@ -39,6 +39,8 @@ class UniversityViewSet(
         "study_formats": StudyFormatSerializer,
         "degree_types": DegreeTypeSerializer,
         "fields_of_study": FieldsOfStudySerializer,
+        "duration": DurationSerializer
+
     }
     filter_backends = [DjangoFilterBackend]
     filterset_class = UniversityFilter
@@ -76,4 +78,10 @@ class UniversityViewSet(
     def field_studies(self, request, *args, **kwargs):
         queryset = FieldsOfStudy.objects.all()
         serializer = FieldsOfStudySerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='durations')
+    def duration(self, request, *args, **kwargs):
+        queryset = Duration.objects.all()
+        serializer = DurationSerializer(queryset, many=True)
         return Response(serializer.data)

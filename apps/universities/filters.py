@@ -9,6 +9,9 @@ class UniversityFilter(django_filters.FilterSet):
     fields_of_study = django_filters.BaseInFilter(field_name="fields_of_study__id", lookup_expr="in")
     languages = django_filters.CharFilter(field_name="languages__id", lookup_expr="icontains")
     study_formats = django_filters.CharFilter(field_name="study_formats__id", lookup_expr="icontains")
+    duration = django_filters.CharFilter(field_name="duration__id", lookup_expr="icontains")
+    degree_type = django_filters.CharFilter(field_name="degree_type__id", lookup_expr="icontains")
+    location = django_filters.CharFilter(field_name="location__id", lookup_expr="icontains")
 
     class Meta:
         model = University
