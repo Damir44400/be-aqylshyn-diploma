@@ -22,3 +22,6 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return self.chat.name
+
+    class Meta:
+        ordering = ['created_at']
