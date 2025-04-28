@@ -15,6 +15,7 @@ from apps.ai_chat.models import ChatMessage
 from apps.common import enums
 from apps.llms import openai_cli
 from apps.llms.prompts.ai_chat_prompt import get_ai_chat_prompt
+from apps.llms.tasks import parse_json_response
 
 
 class ChatService:
@@ -57,8 +58,9 @@ class ChatService:
                 chat_message=chat_message,
                 context_fragments=context_fragments,
             )
-            json_response = json.loads(response)
-        except (json.JSONDecodeError, ValidationError, KeyError) as exc:
+            json_response = parse_json_response(response)
+        except (json.JSONDecodeError, KeyError) as exc:
+            print(exc)
             raise ValidationError(
                 "Не удалось обработать ответ модели. Попробуйте ещё раз."
             ) from exc
