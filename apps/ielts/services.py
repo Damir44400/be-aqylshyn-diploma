@@ -243,7 +243,7 @@ IMPORTANT:
 
             for fill in reading.get("fills", []):
                 question_id = fill.get("question_id")
-                answer = (fill.get("answer") or []).strip()
+                answer = (fill.get("answer") or [])
                 db_question = IeltsReadingQuestion.objects.filter(
                     pk=question_id,
                     reading=db_reading
