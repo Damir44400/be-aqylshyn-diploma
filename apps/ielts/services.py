@@ -243,7 +243,7 @@ IMPORTANT:
 
             for fill in reading.get("fills", []):
                 question_id = fill.get("question_id")
-                answer = (fill.get("answer") or "").strip()
+                answer = (fill.get("answer") or []).strip()
                 db_question = IeltsReadingQuestion.objects.filter(
                     pk=question_id,
                     reading=db_reading
@@ -255,7 +255,7 @@ IMPORTANT:
                 correct_answer = IeltsReadingFillBlank.objects.filter(
                     question=db_question
                 ).values_list("answer", flat=True).first()
-                if correct_answer is not None and correct_answer.strip().lower() == answer.lower():
+                if correct_answer is not None and correct_answer == answer:
                     total_score += 1
 
             for select in reading.get("selects", []):
@@ -330,7 +330,7 @@ IMPORTANT:
 
         for fill in listening.get("fills", []):
             question_id = fill.get("question_id")
-            answer = (fill.get("answer") or "").strip()
+            answer = (fill.get("answer") or [])
             db_question = IeltsListeningQuestion.objects.filter(
                 pk=question_id,
                 listening=db_listening
@@ -342,7 +342,7 @@ IMPORTANT:
             correct_answer = IeltsListeningFillBlank.objects.filter(
                 question=db_question
             ).values_list("answer", flat=True).first()
-            if correct_answer and correct_answer.strip().lower() == answer.lower():
+            if correct_answer and correct_answer == answer:
                 total_score += 1
 
         if not processed:
