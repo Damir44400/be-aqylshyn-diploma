@@ -9,6 +9,7 @@ from apps.ielts.entity_models.ielts_test_submit import IeltsTestSubmit
 from apps.ielts.entity_models.ielts_writing import IeltsWriting
 from apps.ielts.entity_models.listenings.listening import IeltsListening
 from apps.ielts.entity_models.listenings.listening_options import IeltsListeningFillBlank, IeltsListeningOption
+from apps.ielts.entity_models.listenings.listening_parts import IeltsListeningPart
 from apps.ielts.entity_models.listenings.listening_question import IeltsListeningQuestion
 from apps.ielts.entity_models.readings.reading import IeltsReading
 from apps.ielts.entity_models.readings.reading_options import IeltsReadingOption, IeltsReadingFillBlank, \
@@ -302,13 +303,11 @@ IMPORTANT:
 
         total_score = 0
         for listening in listenings:
-
             listening_id = listening.get("listening_id")
-            db_listening = IeltsListening.objects.filter(
-                pk=listening_id,
-                test=db_test
-            ).first()
 
+            db_listening = IeltsListeningPart.objects.filter(
+                pk=listening_id
+            ).first()
             processed = True
 
             for option in listening.get("options", []):
@@ -316,7 +315,7 @@ IMPORTANT:
                 selected_id = option.get("option_id")
                 db_question = IeltsListeningQuestion.objects.filter(
                     pk=question_id,
-                    listening=db_listening
+                    listening_part=db_listening
                 ).first()
                 if not db_question:
                     logger.warning("Listening question %s not found – skipped.", question_id)
@@ -334,7 +333,7 @@ IMPORTANT:
                 answer = (fill.get("answer") or [])
                 db_question = IeltsListeningQuestion.objects.filter(
                     pk=question_id,
-                    listening=db_listening
+                    listening_part=db_listening
                 ).first()
                 if not db_question:
                     logger.warning("Fill question %s not found – skipped.", question_id)
