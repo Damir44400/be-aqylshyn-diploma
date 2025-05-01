@@ -36,7 +36,7 @@ def check_module_completion(sender, instance, created, **kwargs):
         if is_complete:
             lookup = {
                 'user_course': module.user_course,
-                'order__gt': module.order,
+                'order__gt': module.order+1,
             }
             next_mod = models.Module.objects.filter(**lookup) \
                 .order_by('order') \
