@@ -19,6 +19,7 @@ class ModuleSerializer(serializers.ModelSerializer):
             'name',
             'is_completed',
             'total_score',
+            "order",
             'sections',
         )
 

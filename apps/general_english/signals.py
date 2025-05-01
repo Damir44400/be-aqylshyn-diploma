@@ -31,12 +31,13 @@ def check_module_completion(sender, instance, created, **kwargs):
             module.save(update_fields=['is_completed'])
 
         progress = models.UserProgress.objects.filter(
-            course=module.user_course.course
+            course=module.user_course.course,
+            user=module.user_course.user
         ).first()
         if is_complete:
             lookup = {
                 'user_course': module.user_course,
-                'order__gt': module.order+1,
+                'order__gt': module.order,
             }
             next_mod = models.Module.objects.filter(**lookup) \
                 .order_by('order') \

@@ -73,33 +73,13 @@ class CourseGeneralEnglishModuleSerializer(CourseGeneralEnglishRetrieveSerialize
             user_course__course=obj
         ).order_by("order")
         user_progress = general_english_models.UserProgress.objects.filter(
-            user=user,
+            user=user
         ).first()
 
-        if not modules_qs:
-            return None
-
-        for module in modules_qs:
-            module_sections = general_english_models.ModuleScore.objects.filter(
-                module=module
-            ).values_list('section', flat=True).all()
-            required_sections = {
-                enums.ModuleSectionType.WRITING.value,
-                enums.ModuleSectionType.READING.value,
-                enums.ModuleSectionType.SPEAKING.value,
-                enums.ModuleSectionType.LISTENING.value,
-            }
-            is_complete = required_sections.issubset(module_sections)
-            if is_complete and not module.is_completed:
-                module.is_completed = is_complete
-                module.save(update_fields=['is_completed'])
-            print(is_complete)
-            print(module.is_completed)
-            if module.is_completed:
-                next_mod = modules_qs.filter(order__gt=module.order+1).order_by('order').first()
-                if next_mod and user_progress.last_module != next_mod:
-                    user_progress.last_module = next_mod
-                    user_progress.save(update_fields=['last_module'])
-                break
+        module = modules_qs.filter(is_completed=True).last()
+        if module.is_completed:
+            next_mod = modules_qs.filter(order__gt=module.order).order_by('order').first()
+            user_progress.last_module = next_mod
+            user_progress.save(update_fields=['last_module'])
 
         return general_english_serializers.ModuleSerializer(modules_qs, many=True).data
