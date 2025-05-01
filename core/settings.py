@@ -66,7 +66,8 @@ ALLOWED_HOSTS = settings.ALLOWED_HOSTS.split(',') if settings.ALLOWED_HOSTS != "
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'https://aqylshyn.kz',
-    'https://edu-diploma.vercel.app'
+    'https://edu-diploma.vercel.app',
+    'https://www.aqylshyn.kz',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -75,7 +76,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://aqylshyn.kz',
     'https://*.aqylshyn.kz',
     "http://localhost:3000",
-    'https://edu-diploma.vercel.app'
+    'https://edu-diploma.vercel.app',
 ]
 
 # Application definition
