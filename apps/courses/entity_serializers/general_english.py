@@ -68,25 +68,23 @@ class CourseGeneralEnglishModuleSerializer(CourseGeneralEnglishRetrieveSerialize
     def get_modules(self, obj):
         user = self.context['request'].user
 
-        if hasattr(obj, 'user_course'):
-            user_course = obj.user_course.filter(user=user).first()
-            if not user_course:
-                return None
+        modules_qs = general_english_models.Module.objects.filter(
+            user_course__user=user,
+            user_course__course=obj
+        ).order_by("order")
+        print(modules_qs)
 
-            modules_qs = user_course.user_modules.all().order_by("order")
+        user_progress = general_english_models.UserProgress.objects.filter(
+            user=user,
+        ).first()
 
-            module_scores = general_english_models.ModuleScore.objects.filter(
-                module__in=modules_qs
-            ).values('module_id', 'section').distinct()
+        if not modules_qs:
+            return None
 
-            from collections import defaultdict
-            module_sections = defaultdict(set)
-            for score in module_scores:
-                module_sections[score['module_id']].add(score['section'])
-
-            progress = general_english_models.UserProgress.objects.filter(
-                course=user_course.course
-            ).first()
+        for module in modules_qs:
+            module_sections = general_english_models.ModuleScore.objects.filter(
+                module=module
+            ).values_list('section', flat=True).all()
 
             required_sections = {
                 enums.ModuleSectionType.WRITING.value,
@@ -94,21 +92,16 @@ class CourseGeneralEnglishModuleSerializer(CourseGeneralEnglishRetrieveSerialize
                 enums.ModuleSectionType.SPEAKING.value,
                 enums.ModuleSectionType.LISTENING.value,
             }
+            is_complete = required_sections.issubset(module_sections)
+            if is_complete and not module.is_completed:
+                module.is_completed = is_complete
+                module.save(update_fields=['is_completed'])
 
-            for module in modules_qs:
-                completed_sections = module_sections.get(module.id, set())
-                is_complete = required_sections.issubset(completed_sections)
+            if is_complete and user_progress:
+                next_mod = modules_qs.filter(order__gt=module.order).order_by('order').first()
+                if next_mod and user_progress.last_module != next_mod:
+                    user_progress.last_module = next_mod
+                    user_progress.save(update_fields=['last_module'])
+                break
 
-                if module.is_completed != is_complete:
-                    module.is_completed = is_complete
-                    module.save(update_fields=['is_completed'])
-
-                if is_complete and progress:
-                    next_mod = modules_qs.filter(order__gt=module.order).order_by('order').first()
-                    if next_mod and progress.last_module != next_mod:
-                        progress.last_module = next_mod
-                        progress.save(update_fields=['last_module'])
-                    break
-            return general_english_serializers.ModuleSerializer(modules_qs, many=True).data
-
-        return None
+        return general_english_serializers.ModuleSerializer(modules_qs, many=True).data

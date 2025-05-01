@@ -26,7 +26,7 @@ def check_module_completion(sender, instance, created, **kwargs):
 
         is_complete = required.issubset(completed)
 
-        if module.is_completed != is_complete:
+        if is_complete and not module.is_completed:
             module.is_completed = is_complete
             module.save(update_fields=['is_completed'])
 
