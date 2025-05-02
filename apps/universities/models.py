@@ -55,7 +55,7 @@ class StudyFormat(models.Model):
 
 
 class Duration(models.Model):
-    duration = models.IntegerField("Мерзімі", help_text="Мерзімді санмен енгізіңіз")
+    duration = models.FloatField("Мерзімі", help_text="Мерзімді санмен енгізіңіз")
     prefix = models.CharField("Бірлік", max_length=100, help_text="Мысалы: ай, жыл")
 
     def __str__(self):
