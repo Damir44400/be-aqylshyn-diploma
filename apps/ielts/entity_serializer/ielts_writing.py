@@ -22,5 +22,6 @@ class IeltsWritingSerializer(serializers.ModelSerializer):
             "title",
             "part",
             "description",
+            "context",
             "images",
         )
