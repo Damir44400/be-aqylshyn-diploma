@@ -76,7 +76,7 @@ class CourseGeneralEnglishModuleSerializer(CourseGeneralEnglishRetrieveSerialize
         ).first()
         if modules_qs:
             module = modules_qs.filter(is_completed=True).last()
-            if module.is_completed:
+            if module and module.is_completed:
                 next_mod = modules_qs.filter(order__gt=module.order).order_by('order').first()
                 user_progress.last_module = next_mod
             user_progress.save(update_fields=['last_module'])
