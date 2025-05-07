@@ -209,15 +209,23 @@ class ModuleSubmitService:
         ).first()
 
         if not module_section_score:
-            raise ValidationError(f"No score found for section '{section_name}'")
+            payload = {
+                "section": section_name,
+                "score": None
+            }
+            if section_name == "WRITING":
+                payload["writing"] = {
+                    "user_text": None,
+                    "ai_feedback": None,
+                }
+            else:
+                payload['test'] = []
+            return payload
 
         payload = {
             "section": section_name,
             "score": module_section_score.score,
         }
-
-        print(section_name)
-
         if section_name == "WRITING":
             writing_attempt = general_english_models.WritingAttempt.objects.filter(
                 module_score=module_section_score
