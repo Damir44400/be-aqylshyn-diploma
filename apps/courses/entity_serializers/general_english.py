@@ -1,7 +1,6 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from apps.common import enums
 from apps.courses import models as courses_models
 from apps.courses import serializers as course_serializers
 from apps.general_english import models as general_english_models
@@ -75,11 +74,11 @@ class CourseGeneralEnglishModuleSerializer(CourseGeneralEnglishRetrieveSerialize
         user_progress = general_english_models.UserProgress.objects.filter(
             user=user
         ).first()
-
-        module = modules_qs.filter(is_completed=True).last()
-        if module.is_completed:
-            next_mod = modules_qs.filter(order__gt=module.order).order_by('order').first()
-            user_progress.last_module = next_mod
+        if modules_qs:
+            module = modules_qs.filter(is_completed=True).last()
+            if module.is_completed:
+                next_mod = modules_qs.filter(order__gt=module.order).order_by('order').first()
+                user_progress.last_module = next_mod
             user_progress.save(update_fields=['last_module'])
-
-        return general_english_serializers.ModuleSerializer(modules_qs, many=True).data
+            return general_english_serializers.ModuleSerializer(modules_qs, many=True).data
+        return []
