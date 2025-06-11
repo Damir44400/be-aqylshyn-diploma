@@ -9,4 +9,5 @@ class ReadingOptionSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'option',
+            'is_correct'
         )
