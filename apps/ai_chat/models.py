@@ -25,3 +25,12 @@ class ChatMessage(models.Model):
 
     class Meta:
         ordering = ['created_at']
+
+
+class ChatFile(models.Model):
+    chat = models.ForeignKey(Chats, on_delete=models.CASCADE, related_name='files')
+    file = models.FileField(upload_to='chat_files')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.chat.name

@@ -9,7 +9,10 @@ from apps.ai_chat.serializers import ChatSerializer, MessageSerializer, ChatDeta
 from apps.common import mixins as common_mixins
 
 
-class ChatViewSet(common_mixins.ActionSerializerMixin, viewsets.GenericViewSet):
+class ChatViewSet(
+    common_mixins.ActionSerializerMixin,
+    viewsets.GenericViewSet
+):
     permission_classes = (permissions.IsAuthenticated,)
     serializers = {
         "chats": ChatSerializer,

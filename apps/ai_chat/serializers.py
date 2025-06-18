@@ -46,8 +46,4 @@ class ChatDetailSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.Serializer):
     message = serializers.CharField()
     chat_id = serializers.IntegerField(required=False)
-    files = serializers.ListField(
-        child=serializers.FileField(),
-        required=False,
-        allow_empty=True,
-    )
+    file = serializers.FileField(required=False)
